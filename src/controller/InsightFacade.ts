@@ -161,16 +161,15 @@ export default class InsightFacade implements IInsightFacade {
 
     removeDataset(id: string): Promise<InsightResponse> {
 
+        let retInsight:InsightResponse={
+            code:null,
+            body:{}
+        };
 
         return new Promise(function (fulfill, reject) {
-            let retInsight:InsightResponse={
-                code:null,
-                body:{}
-            };
 
             if(id!=="courses"){
                 retInsight.code = 404;
-                retInsight.body = {"error": "not valid courses"};
                 return reject(retInsight);
             }
 
@@ -182,9 +181,8 @@ export default class InsightFacade implements IInsightFacade {
                 retInsight.code = 404;
                 reject(retInsight);
             }
-        });
+        })
     }
-        //return null;
 
 
     performQuery(query: any): Promise <InsightResponse> {
