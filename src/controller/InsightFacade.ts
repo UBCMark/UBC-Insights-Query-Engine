@@ -161,6 +161,7 @@ export default class InsightFacade implements IInsightFacade {
 
     removeDataset(id: string): Promise<InsightResponse> {
 
+
         return new Promise(function (fulfill, reject) {
             let retInsight:InsightResponse={
                 code:null,
@@ -173,21 +174,17 @@ export default class InsightFacade implements IInsightFacade {
                 return reject(retInsight);
             }
 
-            try {
+            if(fs.existsSync(id)) {
                 fs.unlinkSync(id);
-            }catch (err){
+                retInsight.code = 204;
+                fulfill(retInsight);
+            }else{
                 retInsight.code = 404;
-                retInsight.body = {"error": "delete was for a resource that was not previously added"};
-                return reject(retInsight);
+                reject(retInsight);
             }
-
-            retInsight.code = 204;
-            retInsight.body = {"successful": "the operation was successful"};
-
-            fulfill(retInsight);
         });
-        //return null;
     }
+        //return null;
 
 
     performQuery(query: any): Promise <InsightResponse> {
