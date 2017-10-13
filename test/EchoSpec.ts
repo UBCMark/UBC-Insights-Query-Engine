@@ -72,26 +72,26 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("my test", function () {
-        var bitmap = fs.readFileSync('C:/A  UBC Study/a 2017/310/cpsc310_team70/courses.zip');
-        // convert binary data to base64 encoded string
-        var content = new Buffer(bitmap).toString('base64');
-        console.log(content)
-
-        return IF.addDataset("courses", content).then(function (s:any){
-            console.log("success")
-        }).catch(function (err:any){
-            console.log("err")
-        })
-    });
-
-    it("wtf test", function () {
-        var bitmap = fs.readFile('courses.zip', function(err:any, data:any) {
-            return IF.addDataset("courses", data).then(function (s: any) {
-                console.log("success")
-            }).catch(function (err: any) {
-                console.log("err")
-            })
-        });
-    });
+    // it("my test", function () {
+    //     var bitmap = fs.readFileSync('C:/A  UBC Study/a 2017/310/cpsc310_team70/courses.zip');
+    //     // convert binary data to base64 encoded string
+    //     var content = new Buffer(bitmap).toString('base64');
+    //     console.log(content)
+    //
+    //     return IF.addDataset("courses", content).then(function (s:any){
+    //         console.log("success")
+    //     }).catch(function (err:any){
+    //         console.log("err")
+    //     })
+    // });
+    //
+    // it("wtf test", function () {
+    //     var bitmap = fs.readFile('courses.zip', function(err:any, data:any) {
+    //         return IF.addDataset("courses", data).then(function (s: any) {
+    //             console.log("success")
+    //         }).catch(function (err: any) {
+    //             console.log("err")
+    //         })
+    //     });
+    // });
 });
