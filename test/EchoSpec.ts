@@ -82,8 +82,35 @@ describe("EchoSpec", function () {
 
         insight.addDataset("courses", content).then(function (data) {
             console.log(data);
-            expect(true).eq((true));
+            expect(fs.existsSync("courses")).eq(true);
+            //expect(true).eq((true));
 
+
+        }).catch(function (err) {
+            console.log(err);
+
+        });
+        //expect(true).eq((true));
+
+    });
+
+    it("test removeDataset", function () {
+        // var zip = new JSZip();
+        var fs = require('fs');
+        // var files:any[]=[];
+
+        var insight = new InsightFacade();
+        var fileName = '/Users/wyuntian/cpsc310_team70/courses.zip';
+
+        console.log('start file');
+        var content = fs.readFileSync(fileName);
+        content = content.toString("base64");
+
+        console.log(content);
+
+        insight.removeDataset("courses").then(function (data) {
+            console.log(data);
+            expect(fs.existsSync("courses")).eq(false);
 
         }).catch(function (err) {
             console.log(err);
