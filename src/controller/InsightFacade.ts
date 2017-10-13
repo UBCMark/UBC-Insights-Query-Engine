@@ -4,9 +4,9 @@
 import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 var fs  = require('fs');
 import Log from "../Util";
-//import * as jsz from 'jszip';
+
 let jsz = require("jszip");
-//var insight: InsightResponse;
+
 
 interface MyObj{
     [key:string]: string | number;
@@ -73,7 +73,7 @@ export default class InsightFacade implements IInsightFacade {
             jsz.loadAsync(content, {'base64': true}).then(function(data:any){ // data is zipObject
 
                 let listPromiseFiles:any[] = [];
-                //data.files
+
                 data.forEach(function(r:any,f:any){
 
                     listPromiseFiles.push(f.async("string"));
@@ -104,18 +104,17 @@ export default class InsightFacade implements IInsightFacade {
 
                                     listFiles.push(newObj);
 
-                                    console.log(newObj);
+                                    //console.log(newObj);
                                 }
                             }
                             //console.log( listFiles[0]);
                         }
                             //console.log(oneJSON);
                     }
-                    //for(let i of listFiles) {
+
                     let xyz = JSON.stringify(listFiles);
                         fs.writeFile("courses.json", xyz, (fileerr: any, filedata: any) => {
-
-                            //console.log("file written to disk:"+filedata);
+                            
 
                             if (fileerr) {
 
@@ -126,8 +125,8 @@ export default class InsightFacade implements IInsightFacade {
 
 
                             fulfill(insight);
-                            console.log("the file is written");
-                            console.log("addData finished=======");
+                            //console.log("the file is written");
+                            //console.log("addData finished=======");
                         });
                 });
 
