@@ -49,7 +49,6 @@ export default class InsightFacade implements IInsightFacade {
                 body: {}
             };
 
-
             if(id!=="courses"){
                 insight.code = 400;
                 insight.body = {"error": "not a course"};
@@ -85,36 +84,43 @@ export default class InsightFacade implements IInsightFacade {
                         if (that.helper(filedata[eachIndex])) {
 
                             //console.log(filedata[eachIndex]);
-                            var each = JSON.parse(filedata[eachIndex]);
-                            for (let c of each['result']) {
-                                //  console.log(c);
-
-                                if (c.length != 0) {
-                                    let newObj: any = {};
-
-                                    newObj[id + "_dept"] = c["Subject"];
-                                    newObj[id + "_id"] = c["Course"];
-                                    newObj[id + "_avg"] = c["Avg"];
-                                    newObj[id + "_instructor"] = c["Professor"];
-                                    newObj[id + "_title"] = c["Title"];
-                                    newObj[id + "_pass"] = c["Pass"];
-                                    newObj[id + "_fail"] = c["Fail"];
-                                    newObj[id + "_audit"] = c["Audit"];
-                                    newObj[id + "_uuid"] = c["id"];
-
-                                    listFiles.push(newObj);
-
-                                    //console.log(newObj);
-                                }
+                            try {
+                                var each = JSON.parse(filedata[eachIndex]);
+                            } catch (err) {
+                                each = filedata[eachIndex];
                             }
-                            //console.log( listFiles[0]);
+
+                            if (typeof each === 'object') {
+                                for (let c of each['result']) {
+                                    //  console.log(c);
+
+                                    if (c.length != 0) {
+                                        let newObj: any = {};
+
+                                        newObj[id + "_dept"] = c["Subject"];
+                                        newObj[id + "_id"] = c["Course"];
+                                        newObj[id + "_avg"] = c["Avg"];
+                                        newObj[id + "_instructor"] = c["Professor"];
+                                        newObj[id + "_title"] = c["Title"];
+                                        newObj[id + "_pass"] = c["Pass"];
+                                        newObj[id + "_fail"] = c["Fail"];
+                                        newObj[id + "_audit"] = c["Audit"];
+                                        newObj[id + "_uuid"] = c["id"];
+
+                                        listFiles.push(newObj);
+
+                                        //console.log(newObj);
+                                    }
+                                }
+                                //console.log( listFiles[0]);
+                            }
                         }
                             //console.log(oneJSON);
                     }
 
                     let xyz = JSON.stringify(listFiles);
                         fs.writeFile("courses.json", xyz, (fileerr: any, filedata: any) => {
-                            
+
 
                             if (fileerr) {
 
@@ -128,6 +134,10 @@ export default class InsightFacade implements IInsightFacade {
                             //console.log("the file is written");
                             //console.log("addData finished=======");
                         });
+                }).catch(function(perr:any){
+                    insight.code = 400;
+                    insight.body = {"error": "can't write the content to disk"};
+                    reject(insight);
                 });
 
                // fulfill(insight);

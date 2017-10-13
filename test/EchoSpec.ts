@@ -108,6 +108,7 @@ describe("EchoSpec", function () {
 
         console.log(content);
 
+        /*
         insight.removeDataset("courses").then(function (data) {
             console.log(data);
             expect(fs.existsSync("courses")).eq(false);
@@ -116,6 +117,7 @@ describe("EchoSpec", function () {
             console.log(err);
 
         });
+        */
         //expect(true).eq((true));
 
     });
