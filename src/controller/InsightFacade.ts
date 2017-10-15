@@ -2,11 +2,32 @@
  * This is the main programmatic entry point for the project.
  */
 import {IInsightFacade, InsightResponse} from "./IInsightFacade";
-
+var fs  = require('fs');
 import Log from "../Util";
 var fs = require("fs");
 
 var JSZip = require("jszip");
+
+let jsz = require("jszip");
+
+
+interface MyObj{
+    [key:string]: string | number;
+    courses_dept: string;
+    courses_id: string;
+    courses_avg: number;
+    courses_instructor: string;
+    courses_title: string;
+    courses_pass: number;
+    courses_fail: number;
+    courses_audit: number;
+    courses_uuid: number;
+}
+
+interface retQuery{
+    [key:string]: string | any;
+    options: any;
+}
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -14,39 +35,135 @@ export default class InsightFacade implements IInsightFacade {
         Log.trace('InsightFacadeImpl::init()');
     }
 
+    helper(obj:any):boolean{
+        try{
+            JSON.parse(obj);
+            return true;
+        }catch(err){
+            return false;}
+    };
+
     addDataset(id: string, content: string): Promise<InsightResponse> {
-        return null
+        let that = this;
+        return new Promise(function (fulfill, reject) {
+
+            let insight: InsightResponse = {
+                code: null,
+                body: {}
+            };
+
+            if(id!=="courses"){
+                insight.code = 400;
+                insight.body = {"error": "not a course"};
+                return reject(insight);
+            }
+
+            if(fs.existsSync(id)){
+                insight.code = 201;
+                insight.body = {"success": "exist"};
+
+            }else{
+                insight.code = 204;
+                insight.body = {"success": "not exist"};
+
+            }
+
+            // process the content (ie getting the info you want)
+            // store it into data structure
+            // save data structure to disk (using fs.writeFile)
+
+            jsz.loadAsync(content, {'base64': true}).then(function(data:any){ // data is zipObject
+
+                let listPromiseFiles:any[] = [];
+
+                data.forEach(function(r:any,f:any){
+
+                    listPromiseFiles.push(f.async("string"));
+                    });
+
+                let listFiles:any[]=[];
+                Promise.all(listPromiseFiles).then(function(filedata){
+                    for(let eachIndex in filedata){
+                        if (that.helper(filedata[eachIndex])) {
+
+                            try {
+                                var each = JSON.parse(filedata[eachIndex]);
+                            } catch (err) {
+                                each = filedata[eachIndex];
+                            }
+
+                            if (typeof each === 'object') {
+                                for (let c of each['result']) {
+
+                                    if (c.length != 0) {
+                                        let newObj: any = {};
+
+                                        newObj[id + "_dept"] = c["Subject"];
+                                        newObj[id + "_id"] = c["Course"];
+                                        newObj[id + "_avg"] = c["Avg"];
+                                        newObj[id + "_instructor"] = c["Professor"];
+                                        newObj[id + "_title"] = c["Title"];
+                                        newObj[id + "_pass"] = c["Pass"];
+                                        newObj[id + "_fail"] = c["Fail"];
+                                        newObj[id + "_audit"] = c["Audit"];
+                                        newObj[id + "_uuid"] = c["id"];
+
+                                        listFiles.push(newObj);
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    let xyz = JSON.stringify(listFiles);
+                        fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
+
+                            if (fileerr) {
+                                insight.code = 400;
+                                insight.body = {"error": "can't write the content to disk"};
+                                return reject(insight);
+                            }
+
+                            fulfill(insight);
+                        });
+                }).catch(function(perr:any){
+                    insight.code = 400;
+                    insight.body = {"error": "can't write the content to disk"};
+                    reject(insight);
+                });
+
+            }).catch(function(e:any){
+                insight.code = 400;
+                insight.body = {"error": "can't write the content to disk"};
+                reject(insight);
+            });
+        });
     }
 
-    //
-    //     let pArr:any[] = [];
-    //     JSZip.loadAsync(content).then(function (zip: any) {
-    //         console.log(zip)
-    //         zip.forEach(function (r:any, f:any) {
-    //             //console.log(f)
-    //             console.log("aaaaaaaaaaa")
-    //             pArr.push(f.async("string"));
-    //             console.log("aaaaaaaaaaa")
-    //         })
-    //     }).catch(function (err:any) {
-    //         console.log("WTF")
-    //
-    //     });
-    //     Promise.all(pArr).then(function(result){
-    //         console.log("Promise.all fulfilled!");
-    //         console.log(pArr.length)
-    //     }).catch(function(err) {
-    //         console.log("Promise.all rejected from " + err);
-    //     })
-    //     return;
-    //
-    //
-    // }
-    //
     removeDataset(id: string): Promise<InsightResponse> {
-        return null;
-    }
 
+        let retInsight:InsightResponse={
+            code:null,
+            body:{}
+        };
+
+        return new Promise(function (fulfill, reject) {
+
+            if(id!=="courses"){
+                retInsight.code = 404;
+                return reject(retInsight);
+            }
+            if(fs.existsSync(id)) {
+                fs.unlinkSync(id);
+                retInsight.code = 204;
+                fulfill(retInsight);
+            }else{
+                retInsight.code = 404;
+                reject(retInsight);
+            }
+        })
+    }
 
     performQuery(query: any): Promise<InsightResponse> {
         let that = this;
