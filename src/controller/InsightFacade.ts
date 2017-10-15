@@ -47,135 +47,147 @@ export default class InsightFacade implements IInsightFacade {
         return null;
     }
 
-    // performQuery(query: any): Promise<InsightResponse> {
-    //     let sample:any[]=[ { courses_dept: 'adhe', courses_id: '329', courses_avg: 90.02 },
-    //         { courses_dept: 'adhe', courses_id: '412', courses_avg: 90.16 },
-    //         { courses_dept: 'adhe', courses_id: '330', courses_avg: 90.17 },
-    //         { courses_dept: 'adhe', courses_id: '412', courses_avg: 90.18 },
-    //         { courses_dept: 'adhe', courses_id: '330', courses_avg: 90.5 },
-    //         { courses_dept: 'adhe', courses_id: '330', courses_avg: 90.72 },
-    //         { courses_dept: 'adhe', courses_id: '329', courses_avg: 90.82 },
-    //         { courses_dept: 'adhe', courses_id: '330', courses_avg: 90.85 },
-    //         { courses_dept: 'adhe', courses_id: '330', courses_avg: 91.29 },
-    //         { courses_dept: 'adhe', courses_id: '330', courses_avg: 91.33 },
-    //         { courses_dept: 'adhe', courses_id: '330', courses_avg: 91.33 },
-    //         { courses_dept: 'adhe', courses_id: '330', courses_avg: 91.48 },
-    //         { courses_dept: 'adhe', courses_id: '329', courses_avg: 92.54 },
-    //         { courses_dept: 'adhe', courses_id: '329', courses_avg: 93.33 },
-    //         { courses_dept: 'rhsc', courses_id: '501', courses_avg: 95 },
-    //         { courses_dept: 'bmeg', courses_id: '597', courses_avg: 95 },
-    //         { courses_dept: 'bmeg', courses_id: '597', courses_avg: 95 },
-    //         { courses_dept: 'cnps', courses_id: '535', courses_avg: 95 },
-    //         { courses_dept: 'cnps', courses_id: '535', courses_avg: 95 },
-    //         { courses_dept: 'cpsc', courses_id: '589', courses_avg: 95 },
-    //         { courses_dept: 'cpsc', courses_id: '589', courses_avg: 95 },
-    //         { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
-    //         { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
-    //         { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
-    //         { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
-    //         { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
-    //         { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
-    //         { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
-    //         { courses_dept: 'sowk', courses_id: '570', courses_avg: 95 },
-    //         { courses_dept: 'econ', courses_id: '516', courses_avg: 95 },
-    //         { courses_dept: 'edcp', courses_id: '473', courses_avg: 95 },
-    //         { courses_dept: 'edcp', courses_id: '473', courses_avg: 95 },
-    //         { courses_dept: 'epse', courses_id: '606', courses_avg: 95 },
-    //         { courses_dept: 'epse', courses_id: '682', courses_avg: 95 },
-    //         { courses_dept: 'epse', courses_id: '682', courses_avg: 95 },
-    //         { courses_dept: 'kin', courses_id: '499', courses_avg: 95 },
-    //         { courses_dept: 'kin', courses_id: '500', courses_avg: 95 },
-    //         { courses_dept: 'kin', courses_id: '500', courses_avg: 95 },
-    //         { courses_dept: 'math', courses_id: '532', courses_avg: 95 },
-    //         { courses_dept: 'math', courses_id: '532', courses_avg: 95 },
-    //         { courses_dept: 'mtrl', courses_id: '564', courses_avg: 95 },
-    //         { courses_dept: 'mtrl', courses_id: '564', courses_avg: 95 },
-    //         { courses_dept: 'mtrl', courses_id: '599', courses_avg: 95 },
-    //         { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
-    //         { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
-    //         { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
-    //         { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
-    //         { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
-    //         { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
-    //         { courses_dept: 'nurs', courses_id: '424', courses_avg: 95 },
-    //         { courses_dept: 'nurs', courses_id: '424', courses_avg: 95 },
-    //         { courses_dept: 'obst', courses_id: '549', courses_avg: 95 },
-    //         { courses_dept: 'psyc', courses_id: '501', courses_avg: 95 },
-    //         { courses_dept: 'psyc', courses_id: '501', courses_avg: 95 },
-    //         { courses_dept: 'econ', courses_id: '516', courses_avg: 95 },
-    //         { courses_dept: 'adhe', courses_id: '329', courses_avg: 96.11 } ];
-    //     return new Promise(function (fulfill, reject) {
-    //         //var result = {"result": Array<any>()};
-    //         var r = <InsightResponse>{};
-    //         r.code = 1123
-    //         var object = {
-    //             result: new Array(),
-    //         }
-    //         r.body = object
-    //         object["result"].push(sample[2])
-    //         object["result"].push(sample[10])
-    //         const allowed = ['courses_id']
-    //         var raw = {courses_dept: 'adhe', courses_id: '330', courses_avg: 91.33};
-    //
-    //         const filtered = Object.keys(raw)
-    //             .filter( key => allowed.includes(key))
-    //             .reduce((obj, key) => {
-    //                 (<any>obj)[key] = (<any>raw)[key];
-    //                 return obj;
-    //             }, {});
-    //         console.log(filtered)
-    //         console.log(r.body)
-    //         if (2 > 1) {
-    //             reject("rejected!");
-    //         }
-    //         fulfill(r)
-    //     })
-    // }
 
     performQuery(query: any): Promise<InsightResponse> {
         let that = this;
+
         return new Promise(function (fulfill, reject) {
-            let dataset: any = {};
-            let id = "course"
-            let result: any[] = []
-            dataset[id] = JSON.parse(fs.readFileSync(id))
+            try {
+                that.checkValidity(query)
+            } catch(exception) {
+                reject({code: 400, body: {"error": "invalid query"}})
+            }
 
-
-            let where = query["WHERE"]
-            let options = query["OPTIONS"]
-            for (let data of dataset[id]) {
-                if (that.parser(where, data)){
-                    result.push(data)
+            // try {
+                let dataset: any = {};
+                let id = "courses"
+                let result: any[] = []
+                try {
+                    dataset[id] = JSON.parse(fs.readFileSync(id))
+                } catch (err) {
+                    reject({code: 424, body: {"error": "missing dataset"}})
                 }
-            }
-            let filtereds: any[] = []
-            let keysForOpt = Object.keys(options)
-            const allowed = options["COLUMNS"]
-            let sortOn = options["ORDER"] // string
 
-            for (let raw of result) {
-                const filtered = Object.keys(raw)
-                    .filter(key => allowed.includes(key))
-                    .reduce((obj, key) => {
-                        (<any>obj)[key] = (<any>raw)[key];
-                        return obj;
-                    }, {});
-                filtereds.push(filtered)
-            }
 
-            filtereds.sort(function (a, b) {
-                return a[sortOn] - b[sortOn];
-            });
+                let where = query["WHERE"]
+                let options = query["OPTIONS"]
+                for (let data of dataset[id]) {
+                    if (that.parser(where, data)) {
+                        result.push(data)
+                    }
+                }
+                let filtereds: any[] = []
+                let keysForOpt = Object.keys(options)
+                const allowed = options["COLUMNS"]
 
-            // var r = <InsightResponse>{};
-            // r.code = 200
-            // var object = {
-            //     result: filtereds
+                for (let raw of result) {
+                    const filtered = Object.keys(raw)
+                        .filter(key => allowed.includes(key))
+                        .reduce((obj, key) => {
+                            (<any>obj)[key] = (<any>raw)[key];
+                            return obj;
+                        }, {});
+                    filtereds.push(filtered)
+                }
+
+                if (keysForOpt.includes("ORDER")) {
+                    let sortOn = options["ORDER"] // string
+                    filtereds.sort(function (a, b) {
+                        return a[sortOn] - b[sortOn]
+                    });
+                }
+
+                fulfill({code: 200, body: {result: filtereds}})
+            // } catch (err){
+            //     console.log("shouldn't have been here")
             // }
-            // r.body = object
-            fulfill({code:200, body:{result: filtereds}})
 
         })
+    }
+
+    checkValidity(query: any): boolean {
+        let that = this;
+
+        if (query===null || query === {}) throw false;
+        let keys = Object.keys(query)
+        if (keys.length !== 2 ||(!keys.includes("WHERE"))||(!keys.includes("OPTIONS"))) throw false;
+
+
+        let obj1 = query["WHERE"]
+        let obj2 = query[keys[1]]
+        let conds = Object.keys(obj2)
+        if (!conds.includes("COLUMNS")) throw false
+        if ((!conds.includes("ORDER")) && conds.length !== 1) throw false
+        if ((conds.includes("ORDER")) && conds.length !== 2) throw false
+        let colItems = obj2["COLUMNS"]
+
+        if ((!Array.isArray(colItems)) || colItems.length === 0) throw false
+        for (let i of colItems) {
+            if (!that.isKey(i)) {
+                throw false
+            }
+        }
+        if (conds.includes("ORDER")) {
+            let order = obj2["ORDER"]
+            if (!that.isKey(order)) throw false
+            if (!colItems.includes(order)) throw false
+        }
+
+        // now OPTIONS is all good
+        if (!that.isValidFilter(obj1)) throw false;
+
+        return true
+    }
+
+    isKey(item: any): boolean {
+        let that = this;
+        return that.ismKey(item) || that.issKey(item)
+    }
+
+    ismKey(k: any): boolean {
+        if (typeof k !== 'string') return false
+        return (k === 'courses_avg')||(k === 'courses_pass')||(k === 'courses_fail')||(k === 'courses_audit')
+    }
+
+    issKey(k: any): boolean {
+        if (typeof k !== 'string') return false
+        return (k === 'courses_dept')||(k === 'courses_id')||(k === 'courses_instructor')||(k === 'courses_title')||(k=== 'courses_uuid')
+    }
+
+    isValidFilter(obj:any):boolean {
+        let that = this
+            if (!(obj instanceof Object)) {
+                return false;
+            }
+        if (Object.keys(obj).length != 1) return false
+        let key = Object.keys(obj)[0]
+
+        if (key === "AND" || key === "OR") {
+            let objInside = obj[key]
+            if ((!Array.isArray(objInside)) || objInside.length <2) return false
+            for (let i of objInside) {
+                if (!this.isValidFilter(i)) return false
+            }
+            return true
+        }
+        if (key === "GT" || key === "LT" || key === "EQ") {
+            let objInside = obj[key]
+                if (!(objInside instanceof Object))
+                    return false
+            let keys = Object.keys(objInside)
+            if (keys.length !== 1) return false
+            return that.ismKey(keys[0]) && (typeof objInside[keys[0]] == 'number')
+        }
+        if (key === "NOT") {
+            return this.isValidFilter(obj[key])
+        }
+        if (key === "IS") {
+            let objInside = obj[key]
+            if (!(objInside instanceof Object)) return false
+            let keys = Object.keys(objInside)
+            if (keys.length!==1) return false
+            return that.issKey(keys[0]) && (typeof objInside[keys[0]] == 'string')
+        }
     }
 
     parser(filter: any, data: any) : boolean {
