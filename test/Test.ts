@@ -481,6 +481,29 @@ describe("Test", function() {
     //     })
     // });
     //
+    it ("SemanticTestWierdIs", function() {
+        return IF.performQuery({
+            "WHERE":{
+                "AND": [{"GT":{"courses_avg":90}},{"IS":{"courses_dept":"*adhee"}},{"IS":{"courses_id":'330'}}]
+            },
+            "OPTIONS":{
+                "COLUMNS":[
+                    "courses_dept",
+                    "courses_id",
+                    "courses_avg"
+                ],
+                "ORDER":"courses_avg"
+            }
+        }
+    ).then(function (result: any) {
+            Log.test("successful query!");
+            expect(result.body).to.deep.equal({
+                            result: []});
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail()
+        })
+    });
     //
     //
     //
@@ -680,7 +703,7 @@ describe("Test", function() {
                                 },
                                 {
                                     "IS":{
-                                        "courses_dept":"*a"
+                                        "courses_dept":"adhe"
                                     }
                                 }
                             ]
