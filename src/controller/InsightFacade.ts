@@ -339,7 +339,7 @@ export default class InsightFacade implements IInsightFacade {
                 }
                 if (val[0] === "*" && val[val.length - 1] !== "*") {
                     let subString = val.substring(1,val.length)
-                    return data[field].indexOf(subString) === val.length - subString.length
+                    return data[field].indexOf(subString) === data[field].length - subString.length
                 }
                 if (val[0] !== "*" && val[val.length - 1] === "*") {
                     let subString = val.substring(0,val.length-1)
