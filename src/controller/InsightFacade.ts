@@ -177,10 +177,10 @@ export default class InsightFacade implements IInsightFacade {
 
             // try {
                 let dataset: any = {};
-                let id = "courses"
+                let id = "courses~HEAD"
                 let result: any[] = []
                 try {
-                    dataset[id] = JSON.parse(fs.readFileSync(id))
+                    dataset[id] = JSON.parse(fs.readFileSync("cpsc310_team70/"+ id))
                 } catch (err) {
                     reject({code: 424, body: {"error": "missing dataset"}})
                 }
@@ -329,7 +329,6 @@ export default class InsightFacade implements IInsightFacade {
         if (key == "IS") {
             let field = Object.keys(obj)[0]
             let val = obj[field]
-            if (val.length === 0) return false
             if (val.length === 1 && val[0] === "*") return false
             if (val.length === 2 && val[0] === "*" && val[1] === "*") return true
 

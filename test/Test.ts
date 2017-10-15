@@ -506,6 +506,104 @@ describe("Test", function() {
     });
 
 
+    it ("SemanticTestWierdIs2", function() {
+        return IF.performQuery(   {
+            "WHERE": {
+                "AND": [
+                    {
+                        "IS": {
+                            "courses_dept": "bio*"
+                        }
+                    },
+                    {
+                        "GT": {
+                            "courses_avg": 92
+                        }
+                    }
+
+                ]
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "courses_dept",
+                    "courses_avg"
+                ],
+                "ORDER": "courses_avg"
+            }
+        }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            expect(result.body).to.deep.equal({
+                result:
+                    [
+                        {courses_dept: 'biol', courses_avg: 92.1},
+                        {courses_dept: 'biol', courses_avg: 92.1},
+                        {courses_dept: 'biol', courses_avg: 92.19},
+                        {courses_dept: 'biol', courses_avg: 92.19},
+                        {courses_dept: 'biof', courses_avg: 92.33},
+                        {courses_dept: 'biof', courses_avg: 92.33},
+                        {courses_dept: 'biol', courses_avg: 92.36},
+                        {courses_dept: 'biol', courses_avg: 92.36},
+                        {courses_dept: 'biof', courses_avg: 93.45},
+                        {courses_dept: 'biof', courses_avg: 93.45},
+                        {courses_dept: 'biol', courses_avg: 94.33},
+                        {courses_dept: 'biol', courses_avg: 94.33},
+                    ]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail()
+        })
+    });
+    it ("SemanticTestWierdIs3", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [
+                        {
+                            "IS": {
+                                "courses_dept": "*psc"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_instructor": "*, g*"
+                            }
+                        },
+                        {
+                            "GT": {
+                                "courses_avg": 92
+                            }
+                        }
+
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_instructor",
+                        "courses_dept",
+                        "courses_avg"
+                    ],
+                    "ORDER": "courses_avg"
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                result:
+                    [
+                        {courses_instructor: "tsiknis, georgios", courses_dept: "cpsc", courses_avg: 92.5},
+                        {courses_instructor: "tsiknis, georgios", courses_dept: "cpsc", courses_avg: 93.38},
+                        {courses_instructor: "carenini, giuseppe", courses_dept: "cpsc", courses_avg: 94.5}
+                    ]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail()
+        })
+    });
+
+
 
 
 
