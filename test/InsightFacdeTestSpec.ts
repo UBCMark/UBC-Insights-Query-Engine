@@ -47,6 +47,14 @@ describe("InsightFacadeSpec", function () {
         });
     });
 
+    it('Test for an invalid ID.', function () {
+        return insightFacade.addDataset("course", content).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
     it("test addDataset courses.zip", function () {
         return insightFacade.addDataset("courses", content).then(function (data) {
             expect(fs.existsSync("courses")).eq(true);
