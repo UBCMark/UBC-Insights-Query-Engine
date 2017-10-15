@@ -55,7 +55,7 @@ export default class InsightFacade implements IInsightFacade {
             try {
                 that.checkValidity(query)
             } catch(exception) {
-                reject({code: 400, body: {"error": "invalid query"}})
+                reject({code: 400, body: {"error": "invalid query"}});
             }
 
             // try {
