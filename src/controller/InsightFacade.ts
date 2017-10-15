@@ -329,7 +329,23 @@ export default class InsightFacade implements IInsightFacade {
         if (key == "IS") {
             let field = Object.keys(obj)[0]
             let val = obj[field]
-            return data[field]  == val
+            if (val.length === 0) return false
+            if (val.length === 1 && val[0] === "*") return false
+            if (val.length === 2 && val[0] === "*" && val[1] === "*") return true
+
+                if (val[0] === "*" && val[val.length - 1] === "*") {
+                    let subString = val.substring(1,val.length-1)
+                    return data[field].indexOf(subString) >= 0
+                }
+                if (val[0] === "*" && val[val.length - 1] !== "*") {
+                    let subString = val.substring(1,val.length)
+                    return data[field].indexOf(subString) === val.length - subString.length
+                }
+                if (val[0] !== "*" && val[val.length - 1] === "*") {
+                    let subString = val.substring(0,val.length-1)
+                    return data[field].indexOf(subString) === 0
+            }
+            return data[field]  === val
         }
         else {
             if (key == "NOT") {
