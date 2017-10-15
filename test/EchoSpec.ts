@@ -66,6 +66,8 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
+
+/*
     it("test addDataset", function () {
        // var zip = new JSZip();
         var fs = require('fs');
@@ -83,7 +85,7 @@ describe("EchoSpec", function () {
         insight.addDataset("courses", content).then(function (data) {
             console.log(data);
             expect(fs.existsSync("courses")).eq(true);
-            //expect(true).eq((true));
+            expect(data.code).eq(204);
 
 
         }).catch(function (err) {
@@ -92,7 +94,33 @@ describe("EchoSpec", function () {
         });
         //expect(true).eq((true));
 
-    });
+    });*/
+
+   /* it("test addDataset204/201", function () {
+        // var zip = new JSZip();
+        var fs = require('fs');
+        // var files:any[]=[];
+
+        var insight = new InsightFacade();
+        var fileName = '/Users/wyuntian/cpsc310_team70/courses.zip';
+
+        console.log('start file');
+        var content = fs.readFileSync(fileName);
+        content = content.toString("base64");
+
+        console.log(content);
+
+        //expect(true).eq((true));
+
+        insight.addDataset("courses", content).then(function (data) {
+            //console.log(data);
+            expect(data.code).eq(201);
+            //expect(true).eq((true));
+        }).catch(function (err) {
+            //console.log(err);
+        });
+
+    });*/
 
     it("test removeDataset", function () {
         // var zip = new JSZip();
@@ -108,17 +136,42 @@ describe("EchoSpec", function () {
 
         console.log(content);
 
-        /*
+
         insight.removeDataset("courses").then(function (data) {
             console.log(data);
             expect(fs.existsSync("courses")).eq(false);
+            expect(data.code).eq(204);
 
         }).catch(function (err) {
             console.log(err);
 
-        });
-        */
-        //expect(true).eq((true));
+        })
+    });
+
+
+        it("test removeDatasetAgain", function () {
+            // var zip = new JSZip();
+            var fs = require('fs');
+            // var files:any[]=[];
+
+            var insight = new InsightFacade();
+            var fileName = '/Users/wyuntian/cpsc310_team70/courses.zip';
+
+            console.log('start file');
+            var content = fs.readFileSync(fileName);
+            content = content.toString("base64");
+
+            console.log(content);
+
+            insight.removeDataset("courses").then(function (data) {
+                console.log(data);
+                expect(fs.existsSync("courses")).eq(false);
+                expect(data.code).eq(404);
+
+            }).catch(function (err) {
+                console.log(err);
+
+            });
 
     });
 

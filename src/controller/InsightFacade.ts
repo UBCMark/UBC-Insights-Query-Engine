@@ -55,7 +55,7 @@ export default class InsightFacade implements IInsightFacade {
                 return reject(insight);
             }
 
-            if(fs.existsSync("courses")){
+            if(fs.existsSync(id)){
                 insight.code = 201;
                 insight.body = {"success": "exist"};
 
@@ -83,7 +83,6 @@ export default class InsightFacade implements IInsightFacade {
                     for(let eachIndex in filedata){
                         if (that.helper(filedata[eachIndex])) {
 
-                            //console.log(filedata[eachIndex]);
                             try {
                                 var each = JSON.parse(filedata[eachIndex]);
                             } catch (err) {
@@ -92,7 +91,6 @@ export default class InsightFacade implements IInsightFacade {
 
                             if (typeof each === 'object') {
                                 for (let c of each['result']) {
-                                    //  console.log(c);
 
                                     if (c.length != 0) {
                                         let newObj: any = {};
@@ -109,30 +107,22 @@ export default class InsightFacade implements IInsightFacade {
 
                                         listFiles.push(newObj);
 
-                                        //console.log(newObj);
                                     }
                                 }
-                                //console.log( listFiles[0]);
                             }
                         }
-                            //console.log(oneJSON);
                     }
 
                     let xyz = JSON.stringify(listFiles);
-                        fs.writeFile("courses.json", xyz, (fileerr: any, filedata: any) => {
-
+                        fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
                             if (fileerr) {
-
                                 insight.code = 400;
                                 insight.body = {"error": "can't write the content to disk"};
                                 return reject(insight);
                             }
 
-
                             fulfill(insight);
-                            //console.log("the file is written");
-                            //console.log("addData finished=======");
                         });
                 }).catch(function(perr:any){
                     insight.code = 400;
@@ -140,7 +130,6 @@ export default class InsightFacade implements IInsightFacade {
                     reject(insight);
                 });
 
-               // fulfill(insight);
             }).catch(function(e:any){
                 insight.code = 400;
                 insight.body = {"error": "can't write the content to disk"};
@@ -149,15 +138,6 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
-    /*
-    function helper(obj){
-        try{
-            let x = JON.pare(obj);
-            return truel
-        catch{
-        return false
-
-     */
 
     removeDataset(id: string): Promise<InsightResponse> {
 
@@ -172,7 +152,6 @@ export default class InsightFacade implements IInsightFacade {
                 retInsight.code = 404;
                 return reject(retInsight);
             }
-
             if(fs.existsSync(id)) {
                 fs.unlinkSync(id);
                 retInsight.code = 204;
