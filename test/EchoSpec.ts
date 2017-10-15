@@ -1,7 +1,7 @@
 /**
  * Created by rtholmes on 2016-10-31.
  */
-
+var fs = require("fs");
 import Server from "../src/rest/Server";
 import {expect} from 'chai';
 import Log from "../src/Util";
@@ -16,6 +16,12 @@ describe("EchoSpec", function () {
         expect(response).to.have.property('body');
         expect(response.code).to.be.a('number');
     }
+
+    var IF: InsightFacade = null;
+    beforeEach(function () {
+         IF = new InsightFacade();
+    });
+
 
     before(function () {
         Log.test('Before: ' + (<any>this).test.parent.title);
@@ -65,6 +71,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.have.property('error');
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
+
 
 
 /*
@@ -174,5 +181,29 @@ describe("EchoSpec", function () {
             });
 
     });
+
+=======
+    // it("my test", function () {
+    //     var bitmap = fs.readFileSync('C:/A  UBC Study/a 2017/310/cpsc310_team70/courses.zip');
+    //     // convert binary data to base64 encoded string
+    //     var content = new Buffer(bitmap).toString('base64');
+    //     console.log(content)
+    //
+    //     return IF.addDataset("courses", content).then(function (s:any){
+    //         console.log("success")
+    //     }).catch(function (err:any){
+    //         console.log("err")
+    //     })
+    // });
+    //
+    // it("wtf test", function () {
+    //     var bitmap = fs.readFile('courses.zip', function(err:any, data:any) {
+    //         return IF.addDataset("courses", data).then(function (s: any) {
+    //             console.log("success")
+    //         }).catch(function (err: any) {
+    //             console.log("err")
+    //         })
+    //     });
+    // });
 
 });
