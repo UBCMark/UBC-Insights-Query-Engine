@@ -603,6 +603,55 @@ describe("Test", function() {
         })
     });
 
+    it ("SemanticTestWierdIs4", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [
+                        {
+                            "IS": {
+                                "courses_dept": "cpsc"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_instructor": "**"
+                            }
+                        },
+                        {
+                            "GT": {
+                                "courses_avg": 94
+                            }
+                        }
+
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_instructor",
+                        "courses_dept",
+                        "courses_avg"
+                    ],
+                    "ORDER": "courses_avg"
+                }
+            }
+
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                result:
+                    [
+                        {courses_instructor: "carenini, giuseppe", courses_dept: "cpsc", courses_avg: 94.5},
+                        {courses_instructor: "", courses_dept: "cpsc", courses_avg: 94.5},
+                        {courses_instructor: "", courses_dept: "cpsc", courses_avg: 95},
+                        {courses_instructor: "", courses_dept: "cpsc", courses_avg: 95}
+                    ]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail()
+        })
+    });
 
 
 
@@ -963,16 +1012,38 @@ describe("Test", function() {
         })
     });
 
-    //
-    // it("my test", function () {
-    //     var bitmap = fs.readFileSync('C:/A  UBC Study/a 2017/310/cpsc310_team70/courses.zip');
-    //     var content = new Buffer(bitmap).toString('base64');
-    //     console.log(content)
-    //     return IF.addDataset("courses", content).then(function (s:any){
-    //         console.log("success")
-    //     }).catch(function (err:any){
-    //         console.log("err")
-    //     })
-    // });
+
+
+
+    // remove
+    it("test removeDataset", function () {
+
+        IF.removeDataset("courses").then(function (data) {
+            expect(fs.existsSync("courses")).eq(false);
+            expect(data.code).eq(204);
+
+        }).catch(function (err) {
+            console.log(err);
+        })
+    });
+
+
+    it("test removeDatasetwithWrongID", function () {
+        IF.removeDataset("course").then(function (data) {
+            expect.fail();
+        }).catch(function (err) {
+            expect(fs.existsSync("courses")).eq(false);
+            expect(err.code).eq(404);
+        });
+    });
+
+    it("test removeDatasetAgain", function () {
+        IF.removeDataset("courses").then(function (data) {
+            expect.fail();
+        }).catch(function (err) {
+            expect(fs.existsSync("courses")).eq(false);
+            expect(err.code).eq(404);
+        });
+    });
 
 })

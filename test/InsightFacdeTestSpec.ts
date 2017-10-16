@@ -11,7 +11,7 @@ describe("InsightFacadeSpec", function () {
     let content: string = "";
     let contentEmpty: string = "";
     //let fileDirectory:string = __dirname.replace("test/","");
-    let fileDirectory = '/Users/wyuntian/cpsc310_team70';
+    let fileDirectory = 'C:/A  UBC Study/a 2017/310/cpsc310_team70';
 
     fs.readFile(fileDirectory + "/courses.zip", {encoding: "base64"}, function (err: any, data: any) {
         if (err) {
@@ -39,13 +39,13 @@ describe("InsightFacadeSpec", function () {
         insightFacade = null;
     });
 
-    it('Test for an empty courses.', function () {
-        return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
-            expect.fail();
-        }).catch(function (response: InsightResponse) {
-            expect(response.code).to.equal(400);
-        });
-    });
+    // it('Test for an empty courses.', function () {
+    //     return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
+    //         expect.fail();
+    //     }).catch(function (response: InsightResponse) {
+    //         expect(response.code).to.equal(400);
+    //     });
+    // });
 
     it('Test for an invalid ID.', function () {
         return insightFacade.addDataset("course", content).then(function (response: InsightResponse) {
@@ -75,35 +75,35 @@ describe("InsightFacadeSpec", function () {
 
     });
 
-    it("test removeDataset", function () {
-
-        insightFacade.removeDataset("courses").then(function (data) {
-            expect(fs.existsSync("courses")).eq(false);
-            expect(data.code).eq(204);
-
-        }).catch(function (err) {
-            console.log(err);
-        })
-    });
-
-
-    it("test removeDatasetwithWrongID", function () {
-        insightFacade.removeDataset("course").then(function (data) {
-            expect.fail();
-        }).catch(function (err) {
-            expect(fs.existsSync("courses")).eq(false);
-            expect(err.code).eq(404);
-        });
-    });
-
-    it("test removeDatasetAgain", function () {
-        insightFacade.removeDataset("courses").then(function (data) {
-            expect.fail();
-        }).catch(function (err) {
-            expect(fs.existsSync("courses")).eq(false);
-            expect(err.code).eq(404);
-        });
-    });
+    // it("test removeDataset", function () {
+    //
+    //     insightFacade.removeDataset("courses").then(function (data) {
+    //         expect(fs.existsSync("courses")).eq(false);
+    //         expect(data.code).eq(204);
+    //
+    //     }).catch(function (err) {
+    //         console.log(err);
+    //     })
+    // });
+    //
+    //
+    // it("test removeDatasetwithWrongID", function () {
+    //     insightFacade.removeDataset("course").then(function (data) {
+    //         expect.fail();
+    //     }).catch(function (err) {
+    //         expect(fs.existsSync("courses")).eq(false);
+    //         expect(err.code).eq(404);
+    //     });
+    // });
+    //
+    // it("test removeDatasetAgain", function () {
+    //     insightFacade.removeDataset("courses").then(function (data) {
+    //         expect.fail();
+    //     }).catch(function (err) {
+    //         expect(fs.existsSync("courses")).eq(false);
+    //         expect(err.code).eq(404);
+    //     });
+    // });
 
   /*  it('Titanium'
         , function () {
