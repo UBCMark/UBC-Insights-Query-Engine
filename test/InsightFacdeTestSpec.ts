@@ -39,13 +39,13 @@ describe("InsightFacadeSpec", function () {
         insightFacade = null;
     });
 
-    // it('Test for an empty courses.', function () {
-    //     return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
-    //         expect.fail();
-    //     }).catch(function (response: InsightResponse) {
-    //         expect(response.code).to.equal(400);
-    //     });
-    // });
+    it('Test for an empty courses.', function () {
+        return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
 
     it('Test for an invalid ID.', function () {
         return insightFacade.addDataset("course", content).then(function (response: InsightResponse) {
