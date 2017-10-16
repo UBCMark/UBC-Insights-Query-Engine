@@ -11,7 +11,7 @@ export interface InsightResponse {
 
 export interface IInsightFacade {
 
-    /**
+/**
      * Add a dataset to UBCInsight.
      *
      * @param id  The id of the dataset being added.
