@@ -11,9 +11,9 @@ describe("InsightFacadeSpec", function () {
     let content: string = "";
     let contentEmpty: string = "";
     //let fileDirectory:string = __dirname.replace("test/","");
-    let fileDirectory = 'C:/A  UBC Study/a 2017/310/cpsc310_team70';
+    //let fileDirectory = 'C:/A  UBC Study/a 2017/310/cpsc310_team70';
 
-    fs.readFile(fileDirectory + "/courses.zip", {encoding: "base64"}, function (err: any, data: any) {
+    fs.readFile("./courses.zip", {encoding: "base64"}, function (err: any, data: any) {
         if (err) {
             throw err;
         } else {
@@ -21,7 +21,7 @@ describe("InsightFacadeSpec", function () {
         }
     });
 
-    fs.readFile(fileDirectory + "/empty.zip", {encoding: "base64"}, function (err: any, data: any) {
+    fs.readFile("./empty.zip", {encoding: "base64"}, function (err: any, data: any) {
         if (err) {
             throw err;
         } else {
