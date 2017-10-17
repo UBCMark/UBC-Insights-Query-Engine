@@ -8,7 +8,7 @@ describe("Test", function() {
     beforeEach(function () {
         IF = new InsightFacade();
     });
-    //
+
     it("testNullQuery", function(){
         return IF.performQuery(null).then(function (result: any){
             Log.test("query is null, shouldn't have fulfill")
@@ -481,7 +481,177 @@ describe("Test", function() {
         })
     });
 
+    it ("SemanticTestWierdIs", function() {
+        return IF.performQuery({
+            "WHERE":{
+                "AND": [{"GT":{"courses_avg":90}},{"IS":{"courses_dept":"*adhee"}},{"IS":{"courses_id":'330'}}]
+            },
+            "OPTIONS":{
+                "COLUMNS":[
+                    "courses_dept",
+                    "courses_id",
+                    "courses_avg"
+                ],
+                "ORDER":"courses_avg"
+            }
+        }
+    ).then(function (result: any) {
+            Log.test("successful query!");
+            expect(result.body).to.deep.equal({
+                            result: []});
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail()
+        })
+    });
 
+
+    it ("SemanticTestWierdIs2", function() {
+        return IF.performQuery(   {
+            "WHERE": {
+                "AND": [
+                    {
+                        "IS": {
+                            "courses_dept": "bio*"
+                        }
+                    },
+                    {
+                        "GT": {
+                            "courses_avg": 92
+                        }
+                    }
+
+                ]
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "courses_dept",
+                    "courses_avg"
+                ],
+                "ORDER": "courses_avg"
+            }
+        }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            expect(result.body).to.deep.equal({
+                result:
+                    [
+                        {courses_dept: 'biol', courses_avg: 92.1},
+                        {courses_dept: 'biol', courses_avg: 92.1},
+                        {courses_dept: 'biol', courses_avg: 92.19},
+                        {courses_dept: 'biol', courses_avg: 92.19},
+                        {courses_dept: 'biof', courses_avg: 92.33},
+                        {courses_dept: 'biof', courses_avg: 92.33},
+                        {courses_dept: 'biol', courses_avg: 92.36},
+                        {courses_dept: 'biol', courses_avg: 92.36},
+                        {courses_dept: 'biof', courses_avg: 93.45},
+                        {courses_dept: 'biof', courses_avg: 93.45},
+                        {courses_dept: 'biol', courses_avg: 94.33},
+                        {courses_dept: 'biol', courses_avg: 94.33},
+                    ]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail()
+        })
+    });
+    it ("SemanticTestWierdIs3", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [
+                        {
+                            "IS": {
+                                "courses_dept": "*psc"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_instructor": "*, g*"
+                            }
+                        },
+                        {
+                            "GT": {
+                                "courses_avg": 92
+                            }
+                        }
+
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_instructor",
+                        "courses_dept",
+                        "courses_avg"
+                    ],
+                    "ORDER": "courses_avg"
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                result:
+                    [
+                        {courses_instructor: "tsiknis, georgios", courses_dept: "cpsc", courses_avg: 92.5},
+                        {courses_instructor: "tsiknis, georgios", courses_dept: "cpsc", courses_avg: 93.38},
+                        {courses_instructor: "carenini, giuseppe", courses_dept: "cpsc", courses_avg: 94.5}
+                    ]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail()
+        })
+    });
+
+    it ("SemanticTestWierdIs4", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [
+                        {
+                            "IS": {
+                                "courses_dept": "cpsc"
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_instructor": "**"
+                            }
+                        },
+                        {
+                            "GT": {
+                                "courses_avg": 94
+                            }
+                        }
+
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_instructor",
+                        "courses_dept",
+                        "courses_avg"
+                    ],
+                    "ORDER": "courses_avg"
+                }
+            }
+
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                result:
+                    [
+                        {courses_instructor: "carenini, giuseppe", courses_dept: "cpsc", courses_avg: 94.5},
+                        {courses_instructor: "", courses_dept: "cpsc", courses_avg: 94.5},
+                        {courses_instructor: "", courses_dept: "cpsc", courses_avg: 95},
+                        {courses_instructor: "", courses_dept: "cpsc", courses_avg: 95}
+                    ]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail()
+        })
+    });
 
 
 
@@ -703,6 +873,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
+            console.log(result.body)
             expect(result.body).to.deep.equal({
                 result:
                     [ { courses_dept: 'adhe', courses_id: '329', courses_avg: 90.02 },
@@ -841,16 +1012,38 @@ describe("Test", function() {
         })
     });
 
-    //
-    // it("my test", function () {
-    //     var bitmap = fs.readFileSync('C:/A  UBC Study/a 2017/310/cpsc310_team70/courses.zip');
-    //     var content = new Buffer(bitmap).toString('base64');
-    //     console.log(content)
-    //     return IF.addDataset("courses", content).then(function (s:any){
-    //         console.log("success")
-    //     }).catch(function (err:any){
-    //         console.log("err")
-    //     })
-    // });
+
+
+
+    // remove
+    it("test removeDataset", function () {
+
+        IF.removeDataset("courses").then(function (data) {
+            expect(fs.existsSync("courses")).eq(false);
+            expect(data.code).eq(204);
+
+        }).catch(function (err) {
+            console.log(err);
+        })
+    });
+
+
+    it("test removeDatasetwithWrongID", function () {
+        IF.removeDataset("course").then(function (data) {
+            expect.fail();
+        }).catch(function (err) {
+            expect(fs.existsSync("courses")).eq(false);
+            expect(err.code).eq(404);
+        });
+    });
+
+    it("test removeDatasetAgain", function () {
+        IF.removeDataset("courses").then(function (data) {
+            expect.fail();
+        }).catch(function (err) {
+            expect(fs.existsSync("courses")).eq(false);
+            expect(err.code).eq(404);
+        });
+    });
 
 })

@@ -172,7 +172,7 @@ export default class InsightFacade implements IInsightFacade {
             try {
                 that.checkValidity(query)
             } catch(exception) {
-                reject({code: 400, body: {"error": "invalid query"}})
+                reject({code: 400, body: {"error": "invalid query"}});
             }
 
             // try {
@@ -329,7 +329,23 @@ export default class InsightFacade implements IInsightFacade {
         if (key == "IS") {
             let field = Object.keys(obj)[0]
             let val = obj[field]
-            return data[field]  == val
+            if (val.length === 1 && val[0] === "*") return false
+            if (val.length === 2 && val[0] === "*" && val[1] === "*") return true
+
+                if (val[0] === "*" && val[val.length - 1] === "*") {
+                    let subString = val.substring(1,val.length-1)
+                    return data[field].indexOf(subString) >= 0
+                }
+                if (val[0] === "*" && val[val.length - 1] !== "*") {
+                    let subString = val.substring(1,val.length)
+                    if (data[field].length < subString.length) return false
+                    return data[field].indexOf(subString) === data[field].length - subString.length
+                }
+                if (val[0] !== "*" && val[val.length - 1] === "*") {
+                    let subString = val.substring(0,val.length-1)
+                    return data[field].indexOf(subString) === 0
+            }
+            return data[field]  === val
         }
         else {
             if (key == "NOT") {

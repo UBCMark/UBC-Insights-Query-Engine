@@ -7,6 +7,10 @@ import {expect} from 'chai';
 import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 import InsightFacade from "../src/controller/InsightFacade";
+import chai = require('chai');
+import chaiHttp = require('chai-http');
+import Response = ChaiHttp.Response;
+import restify = require('restify');
 
 describe("EchoSpec", function () {
 
@@ -72,138 +76,43 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
+    it("Test Server", function() {
 
+        // Init
+        chai.use(chaiHttp);
+        let server = new Server(4321);
+        let URL = "http://127.0.0.1:4321";
 
-/*
-    it("test addDataset", function () {
-       // var zip = new JSZip();
-        var fs = require('fs');
-       // var files:any[]=[];
+        // Test
+        expect(server).to.not.equal(undefined);
+        try{
+            Server.echo((<restify.Request>{}), null, null);
+            expect.fail()
+        } catch(err) {
+            expect(err.message).to.equal("Cannot read property 'json' of null");
+        }
 
-        var insight = new InsightFacade();
-        var fileName = '/Users/wyuntian/cpsc310_team70/courses.zip';
-
-        console.log('start file');
-        var content = fs.readFileSync(fileName);
-        content = content.toString("base64");
-
-        console.log(content);
-
-        insight.addDataset("courses", content).then(function (data) {
-            console.log(data);
-            expect(fs.existsSync("courses")).eq(true);
-            expect(data.code).eq(204);
-
-
-        }).catch(function (err) {
-            console.log(err);
-
+        return server.start().then(function(success: boolean) {
+            return chai.request(URL)
+                .get("/")
+        }).catch(function(err) {
+            expect.fail()
+        }).then(function(res: Response) {
+            expect(res.status).to.be.equal(200);
+            return chai.request(URL)
+                .get("/echo/Hello")
+        }).catch(function(err) {
+            expect.fail()
+        }).then(function(res: Response) {
+            expect(res.status).to.be.equal(200);
+            return server.start()
+        }).then(function(success: boolean) {
+            expect.fail();
+        }).catch(function(err) {
+            expect(err.code).to.equal('EADDRINUSE');
+            return server.stop();
+        }).catch(function(err) {
+            expect.fail();
         });
-        //expect(true).eq((true));
-
-    });*/
-
-   /* it("test addDataset204/201", function () {
-        // var zip = new JSZip();
-        var fs = require('fs');
-        // var files:any[]=[];
-
-        var insight = new InsightFacade();
-        var fileName = '/Users/wyuntian/cpsc310_team70/courses.zip';
-
-        console.log('start file');
-        var content = fs.readFileSync(fileName);
-        content = content.toString("base64");
-
-        console.log(content);
-
-        //expect(true).eq((true));
-
-        insight.addDataset("courses", content).then(function (data) {
-            //console.log(data);
-            expect(data.code).eq(201);
-            //expect(true).eq((true));
-        }).catch(function (err) {
-            //console.log(err);
-        });
-
-    });*/
-
-    it("test removeDataset", function () {
-        // var zip = new JSZip();
-        var fs = require('fs');
-        // var files:any[]=[];
-
-        var insight = new InsightFacade();
-        var fileName = '/Users/wyuntian/cpsc310_team70/courses.zip';
-
-        console.log('start file');
-        var content = fs.readFileSync(fileName);
-        content = content.toString("base64");
-
-        console.log(content);
-
-
-        insight.removeDataset("courses").then(function (data) {
-            console.log(data);
-            expect(fs.existsSync("courses")).eq(false);
-            expect(data.code).eq(204);
-
-        }).catch(function (err) {
-            console.log(err);
-
-        })
     });
-
-
-        it("test removeDatasetAgain", function () {
-            // var zip = new JSZip();
-            var fs = require('fs');
-            // var files:any[]=[];
-
-            var insight = new InsightFacade();
-            var fileName = '/Users/wyuntian/cpsc310_team70/courses.zip';
-
-            console.log('start file');
-            var content = fs.readFileSync(fileName);
-            content = content.toString("base64");
-
-            console.log(content);
-
-            insight.removeDataset("courses").then(function (data) {
-                console.log(data);
-                expect(fs.existsSync("courses")).eq(false);
-                expect(data.code).eq(404);
-
-            }).catch(function (err) {
-                console.log(err);
-
-            });
-
-    });
-
-=======
-    // it("my test", function () {
-    //     var bitmap = fs.readFileSync('C:/A  UBC Study/a 2017/310/cpsc310_team70/courses.zip');
-    //     // convert binary data to base64 encoded string
-    //     var content = new Buffer(bitmap).toString('base64');
-    //     console.log(content)
-    //
-    //     return IF.addDataset("courses", content).then(function (s:any){
-    //         console.log("success")
-    //     }).catch(function (err:any){
-    //         console.log("err")
-    //     })
-    // });
-    //
-    // it("wtf test", function () {
-    //     var bitmap = fs.readFile('courses.zip', function(err:any, data:any) {
-    //         return IF.addDataset("courses", data).then(function (s: any) {
-    //             console.log("success")
-    //         }).catch(function (err: any) {
-    //             console.log("err")
-    //         })
-    //     });
-    // });
-
 });
