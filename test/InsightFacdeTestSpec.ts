@@ -13,7 +13,7 @@ describe("InsightFacadeSpec", function () {
     //let fileDirectory:string = __dirname.replace("test/","");
     //let fileDirectory = 'C:/A  UBC Study/a 2017/310/cpsc310_team70';
 
-    fs.readFile("./courses.zip", {encoding: "base64"}, function (err: any, data: any) {
+    fs.readFile("./rooms.zip", {encoding: "base64"}, function (err: any, data: any) {
         if (err) {
             throw err;
         } else {
@@ -39,102 +39,42 @@ describe("InsightFacadeSpec", function () {
         insightFacade = null;
     });
 
-    it('Test for an empty courses.', function () {
-        return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
-            expect.fail();
-        }).catch(function (response: InsightResponse) {
-            expect(response.code).to.equal(400);
-        });
-    });
-
-    it('Test for an invalid ID.', function () {
-        return insightFacade.addDataset("course", content).then(function (response: InsightResponse) {
-            expect.fail();
-        }).catch(function (response: InsightResponse) {
-            expect(response.code).to.equal(400);
-        });
-    });
-
-    it("test addDataset courses.zip", function () {
-        return insightFacade.addDataset("courses", content).then(function (data) {
-            expect(fs.existsSync("courses")).eq(true);
-            expect(data.code).eq(204);
-        }).catch(function (err) {
-            console.log(err);
-
-        });
-    });
-
-    it("test addDataset204/201", function () {
-
-        return insightFacade.addDataset("courses", content).then(function (data) {
-            expect(data.code).eq(201);
-        }).catch(function (err) {
-            console.log(err);
-        });
-
-    });
-
-    // it("test removeDataset", function () {
+ //   it('Test for an empty courses.', function () {
+   //
+   //      return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
+   //          expect.fail();
+   //
+   //      }).catch(function (response: InsightResponse) {
+   //          expect(response.code).to.equal(400);
+   //      });
+ //   });
     //
-    //     insightFacade.removeDataset("courses").then(function (data) {
-    //         expect(fs.existsSync("courses")).eq(false);
+    // it('Test for an invalid ID.', function () {
+    //     return insightFacade.addDataset("course", content).then(function (response: InsightResponse) {
+    //         expect.fail();
+    //     }).catch(function (response: InsightResponse) {
+    //         expect(response.code).to.equal(400);
+    //     });
+    // });
+    //
+    // it("test addDataset courses.zip", function () {
+    //     return insightFacade.addDataset("courses", content).then(function (data) {
+    //         expect(fs.existsSync("courses")).eq(true);
     //         expect(data.code).eq(204);
-    //
     //     }).catch(function (err) {
     //         console.log(err);
-    //     })
-    // });
     //
-    //
-    // it("test removeDatasetwithWrongID", function () {
-    //     insightFacade.removeDataset("course").then(function (data) {
-    //         expect.fail();
-    //     }).catch(function (err) {
-    //         expect(fs.existsSync("courses")).eq(false);
-    //         expect(err.code).eq(404);
     //     });
     // });
     //
-    // it("test removeDatasetAgain", function () {
-    //     insightFacade.removeDataset("courses").then(function (data) {
-    //         expect.fail();
+    // it("test addDataset204/201", function () {
+    //
+    //     return insightFacade.addDataset("courses", content).then(function (data) {
+    //         expect(data.code).eq(201);
     //     }).catch(function (err) {
-    //         expect(fs.existsSync("courses")).eq(false);
-    //         expect(err.code).eq(404);
+    //         console.log(err);
     //     });
+    //
     // });
 
-  /*  it('Titanium'
-        , function () {
-            return insightFacade.performQuery( <any>
-                {
-                    "WHERE": {
-                    },
-                    "OPTIONS": {
-                        "COLUMNS": [
-                            "courses_dept",
-                            "courses_id",
-                            "courses_uuid"
-
-                        ],
-                        "ORDER": {
-                            "dir": "DOWN",
-                            "keys": ["courses_uuid"]
-                        },
-                        "FORM": "TABLE"
-                    },
-                    "TRANSFORMATIONS": {
-                        "GROUP": [ "courses_dept",
-                            "courses_id",
-                            "courses_uuid"],
-                        "APPLY": []
-                    }
-                }
-            ).then(function (response: InsightResponse) {
-                expect(response.code).to.equal(200);
-            }).catch(function (response: InsightResponse) {
-                expect.fail();
-            });
-        });*/
 });

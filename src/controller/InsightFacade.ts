@@ -9,6 +9,7 @@ var fs = require("fs");
 var JSZip = require("jszip");
 
 let jsz = require("jszip");
+const parse5 = require('parse5');
 
 
 interface MyObj{
@@ -43,103 +44,163 @@ export default class InsightFacade implements IInsightFacade {
             return false;}
     };
 
-    addDataset(id: string, content: string): Promise<InsightResponse> {
-        let that = this;
-        return new Promise(function (fulfill, reject) {
+    // assume id = "rooms"
+     addDataset(id: string, content: string): Promise<InsightResponse> {
+         //     let that = this;
+         //     return new Promise(function (fulfill, reject) {
+         //         jsz.loadAsync(content, {'base64': true}).then(function (data:any){
+         //
+         //         }).catch (function(err:any){
+         //
+         //         });
+         //
+         //     });
+         // }
+         let that = this;
 
-            let insight: InsightResponse = {
-                code: null,
-                body: {}
-            };
 
-            if(id!=="courses"){
-                insight.code = 400;
-                insight.body = {"error": "not a course"};
-                return reject(insight);
-            }
+         return new Promise(function (fulfill, reject) {
+             let insight: InsightResponse = {
+                 code: null,
+                 body: {}
+             };
 
-            if(fs.existsSync(id)){
-                insight.code = 201;
-                insight.body = {"success": "exist"};
+             jsz.loadAsync(content, {'base64': true}).then(function (data:any){
+                 //console.log(data)
+                 let listPromiseFiles:any[] = [];
+                 data.forEach(function(r:any,f:any){
+                     listPromiseFiles.push(f.async("string"));
+                 });
 
-            }else{
-                insight.code = 204;
-                insight.body = {"success": "not exist"};
+                 console.log(listPromiseFiles.length)
 
-            }
+                 Promise.all(listPromiseFiles).then(function(filedata) {
+                     console.log(filedata[82]);
+                     const document = parse5.parse(filedata[82])
+                     console.log(document.childNodes[6].childNodes[3].childNodes);
+                     fulfill('fulfill')
+                 }).catch(function (err:any) {
+                     console.log('fail')
+                     reject()
+                 })
 
-            // process the content (ie getting the info you want)
-            // store it into data structure
-            // save data structure to disk (using fs.writeFile)
+             }).catch (function(err:any){
+                 console.log(err)
+                 reject()
+             });
 
-            jsz.loadAsync(content, {'base64': true}).then(function(data:any){ // data is zipObject
+         });
 
-                let listPromiseFiles:any[] = [];
+     }
 
-                data.forEach(function(r:any,f:any){
+            // if(id!=="courses"){
+            //     insight.code = 400;
+            //     insight.body = {"error": "not a course"};
+            //     return reject(insight);
+            // }
+            //
+            // if(fs.existsSync(id)){
+            //     insight.code = 201;
+            //     insight.body = {"success": "exist"};
+            //
+            // }else{
+            //     insight.code = 204;
+            //     insight.body = {"success": "not exist"};
+            //
+            // }
 
-                    listPromiseFiles.push(f.async("string"));
-                    });
+    //         jsz.loadAsync(content, {'base64': true}).then(function(data:any){ // data is zipObject
+    //
+    //             let listPromiseFiles:any[] = [];
+    //
+    //             data.forEach(function(r:any,f:any){
+    //
+    //                 listPromiseFiles.push(f.async("string"));
+    //                 });
+    //
+    //             let listFiles:any[]=[];
+    //             Promise.all(listPromiseFiles).then(function(filedata){
+    //                 for(let eachIndex in filedata){
+    //                     if (that.helper(filedata[eachIndex])) {
+    //
+    //                         try {
+    //                             var each = JSON.parse(filedata[eachIndex]);
+    //                         } catch (err) {
+    //                             each = filedata[eachIndex];
+    //                         }
+    //
+    //                         if (typeof each === 'object') {
+    //                             for (let c of each['result']) {
+    //
+    //                                 if (c.length != 0) {
+    //                                     let newObj: any = {};
+    //
+    //                                     newObj[id + "_dept"] = c["Subject"];
+    //                                     newObj[id + "_id"] = c["Course"];
+    //                                     newObj[id + "_avg"] = c["Avg"];
+    //                                     newObj[id + "_instructor"] = c["Professor"];
+    //                                     newObj[id + "_title"] = c["Title"];
+    //                                     newObj[id + "_pass"] = c["Pass"];
+    //                                     newObj[id + "_fail"] = c["Fail"];
+    //                                     newObj[id + "_audit"] = c["Audit"];
+    //                                     newObj[id + "_uuid"] = c["id"];
+    //
+    //                                     listFiles.push(newObj);
+    //
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //
+    //                 let xyz = JSON.stringify(listFiles);
+    //                     fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
+    //
+    //                         if (fileerr) {
+    //                             insight.code = 400;
+    //                             insight.body = {"error": "can't write the content to disk"};
+    //                             return reject(insight);
+    //                         }
+    //
+    //                         fulfill(insight);
+    //                     });
+    //             }).catch(function(perr:any){
+    //                 insight.code = 400;
+    //                 insight.body = {"error": "can't write the content to disk"};
+    //                 reject(insight);
+    //             });
+    //
+    //         }).catch(function(e:any){
+    //             insight.code = 400;
+    //             insight.body = {"error": "can't write the content to disk"};
+    //             reject(insight);
+    //         });
+    //     });
+    // }
 
-                let listFiles:any[]=[];
-                Promise.all(listPromiseFiles).then(function(filedata){
-                    for(let eachIndex in filedata){
-                        if (that.helper(filedata[eachIndex])) {
-
-                            try {
-                                var each = JSON.parse(filedata[eachIndex]);
-                            } catch (err) {
-                                each = filedata[eachIndex];
-                            }
-
-                            if (typeof each === 'object') {
-                                for (let c of each['result']) {
-
-                                    if (c.length != 0) {
-                                        let newObj: any = {};
-
-                                        newObj[id + "_dept"] = c["Subject"];
-                                        newObj[id + "_id"] = c["Course"];
-                                        newObj[id + "_avg"] = c["Avg"];
-                                        newObj[id + "_instructor"] = c["Professor"];
-                                        newObj[id + "_title"] = c["Title"];
-                                        newObj[id + "_pass"] = c["Pass"];
-                                        newObj[id + "_fail"] = c["Fail"];
-                                        newObj[id + "_audit"] = c["Audit"];
-                                        newObj[id + "_uuid"] = c["id"];
-
-                                        listFiles.push(newObj);
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    let xyz = JSON.stringify(listFiles);
-                        fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
-
-                            if (fileerr) {
-                                insight.code = 400;
-                                insight.body = {"error": "can't write the content to disk"};
-                                return reject(insight);
-                            }
-
-                            fulfill(insight);
-                        });
-                }).catch(function(perr:any){
-                    insight.code = 400;
-                    insight.body = {"error": "can't write the content to disk"};
-                    reject(insight);
-                });
-
-            }).catch(function(e:any){
-                insight.code = 400;
-                insight.body = {"error": "can't write the content to disk"};
-                reject(insight);
-            });
-        });
-    }
+// Temporary removed from AddData
+// ------------------------------------------
+// let insight: InsightResponse = {
+//     code: null,
+//     body: {}
+// };
+//
+// if(id!=="courses"){
+//     insight.code = 400;
+//     insight.body = {"error": "not a course"};
+//     return reject(insight);
+// }
+//
+// if(fs.existsSync(id)){
+//     insight.code = 201;
+//     insight.body = {"success": "exist"};
+//
+// }else{
+//     insight.code = 204;
+//     insight.body = {"success": "not exist"};
+//
+// }
+// --------------------------------------------
 
     removeDataset(id: string): Promise<InsightResponse> {
 
