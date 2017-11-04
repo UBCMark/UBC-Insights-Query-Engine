@@ -4,6 +4,7 @@
 import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 var fs  = require('fs');
 import Log from "../Util";
+import keys = require("core-js/fn/array/keys");
 var fs = require("fs");
 
 var JSZip = require("jszip");
@@ -43,6 +44,22 @@ export default class InsightFacade implements IInsightFacade {
         }catch(err){
             return false;}
     };
+    //
+    // findInfo(content: string, o: any): Object{
+    //     let that = this
+    //     if (typeof o !== 'object') return
+    //     if (Array.isArray(o)) return
+    //     let keys = Object.keys(o)
+    //     if (keys.indexOf('attrs') != -1) {
+    //         let attrs = o.attrs;
+    //         for (let each_attr of attrs) {
+    //             if (each_attr.name === 'class' && each_attr.value === 'views-table cols-5 table') {console.log('aaa')}
+    //
+    //         }
+    //     }
+    //
+    //     return 1;
+    // }
 
     // assume id = "rooms"
      addDataset(id: string, content: string): Promise<InsightResponse> {
@@ -75,9 +92,34 @@ export default class InsightFacade implements IInsightFacade {
                  console.log(listPromiseFiles.length)
 
                  Promise.all(listPromiseFiles).then(function(filedata) {
-                     console.log(filedata[82]);
-                     const document = parse5.parse(filedata[82])
-                     console.log(document.childNodes[6].childNodes[3].childNodes);
+                     let indexJS = filedata[82]
+                     const document = parse5.parse(indexJS)
+                     let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
+                         .childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes[1]
+                         .childNodes[3]
+                     //that.findInfo('a', document.childNodes[6].childNodes[3].childNodes[1].parentNode)
+                     console.log(tree);
+                     let lobuildings: any = []
+                     let buildings: any = {}
+                     for (let i = 1; i < tree.childNodes.length; i+=2) {
+                        let tr = tree.childNodes[i]
+                         let sname = tr.childNodes[3].childNodes[0].value.trim()
+                         console.log(sname)
+                         let fname = tr.childNodes[5].childNodes[1].childNodes[0].value.trim()
+                         console.log(fname)
+                         let address = tr.childNodes[7].childNodes[0].value.trim()
+                         console.log(address)
+                         let link = tr.childNodes[9].childNodes[1].attrs[0].value.trim()
+                         console.log(link)
+                         let building = {rooms_fullname: fname, rooms_shortname: sname,
+                             rooms_address: address, link: link}
+                         console.log(building)
+                         buildings[fname] = building;
+                     }
+                     console.log(buildings)
+
+
+
                      fulfill('fulfill')
                  }).catch(function (err:any) {
                      console.log('fail')
@@ -92,6 +134,7 @@ export default class InsightFacade implements IInsightFacade {
          });
 
      }
+
 
             // if(id!=="courses"){
             //     insight.code = 400;
