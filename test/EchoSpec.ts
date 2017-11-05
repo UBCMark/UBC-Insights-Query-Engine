@@ -56,9 +56,36 @@ describe("EchoSpec", function () {
 
     it("Test", function () {
         return IF.addDataset("rooms", content).then(function (data) {
+            let dataset: any = {};
+            let id = "rooms"
+            let id2 = "courses"
+            dataset["rooms"] = 123;
+            dataset[id2] = 321
+            console.log(dataset)
             console.log('success')
         }).catch(function (err) {
             console.log('testfail')
+        })
+    });
+
+
+    it("Test2", function () {
+        return IF.performQuery({
+            "WHERE": {
+                "IS": {
+                    "rooms_name": "DMP_*"
+                }
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "rooms_name"
+                ],
+                "ORDER": "rooms_name"
+            }
+        }).then(function (data) {
+            console.log('query success')
+        }).catch(function (err) {
+            console.log('query testfail')
         })
     });
 
