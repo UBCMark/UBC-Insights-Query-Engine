@@ -1314,7 +1314,7 @@ describe("Test", function() {
 
 
 
-    it("Rtest2", function() {
+    it("RtestForUCLL", function() {
         return IF.performQuery({
                 "WHERE": {
                     "IS": {
@@ -1350,6 +1350,39 @@ describe("Test", function() {
         })
     });
 
+    it("Rtest2", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "IS": {
+                        "rooms_name": "UCLL_*"
+                    }
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name"
+                    ],
+                    "ORDER": "rooms_name"
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                result: [{
+                    "rooms_name": "UCLL_101"
+                }, {
+                    "rooms_name": "UCLL_103"
+                }, {
+                    "rooms_name": "UCLL_107"
+                }, {
+                    "rooms_name": "UCLL_109"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
 
     //
     // // remove
@@ -1383,6 +1416,7 @@ describe("Test", function() {
         });
     });
 
+    //remove rooms
     it("test removeDataset", function () {
 
         IF.removeDataset("rooms").then(function (data) {
@@ -1412,5 +1446,7 @@ describe("Test", function() {
             expect(err.code).eq(404);
         });
     });
+
+
 
 })

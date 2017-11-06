@@ -117,8 +117,13 @@ export default class InsightFacade implements IInsightFacade {
                             var tBody = []
                             let result:any =[]
                             try {
-                                flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-                                    .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
+                                if (TempInfo[hid + "_fullname"] !== "The Leon and Thea Koerner University Centre") {
+                                    flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                                        .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
+                                } else {
+                                    flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+                                        .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
+                                }
                                 tBody = flag
                                 for (let i =1; i < tBody.length; i+=2) {
                                     // let p = new Promise(function (f,r) {
@@ -363,15 +368,15 @@ export default class InsightFacade implements IInsightFacade {
 
         }
 
-        if (fs.existsSync(id)) {
-            insight.code = 201;
-            insight.body = {"success": "exist"};
-
-        } else {
-            insight.code = 204;
-            insight.body = {"success": "not exist"};
-
-        }
+        // if (fs.existsSync(id)) {
+        //     insight.code = 201;
+        //     insight.body = {"success": "exist"};
+        //
+        // } else {
+        //     insight.code = 204;
+        //     insight.body = {"success": "not exist"};
+        //
+        // }
 
         // process the content (ie getting the info you want)
         // store it into data structure
@@ -379,6 +384,17 @@ export default class InsightFacade implements IInsightFacade {
 
         if (id === "rooms") {
             return new Promise(function (fulfill, reject) {
+
+                if (fs.existsSync(id)) {
+                    insight.code = 201;
+                    insight.body = {"success": "exist"};
+
+                } else {
+                    insight.code = 204;
+                    insight.body = {"success": "not exist"};
+
+                }
+
                 if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
                     let listPromiseFiles: any[] = [];
@@ -526,6 +542,17 @@ export default class InsightFacade implements IInsightFacade {
         if (id === "courses") {
 
             return new Promise(function (fulfill, reject) {
+
+                if (fs.existsSync(id)) {
+                    insight.code = 201;
+                    insight.body = {"success": "exist"};
+
+                } else {
+                    insight.code = 204;
+                    insight.body = {"success": "not exist"};
+
+                }
+
                 if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) { // data is zipObject
 
@@ -824,10 +851,10 @@ export default class InsightFacade implements IInsightFacade {
 
         return new Promise(function (fulfill, reject) {
 
-            // if(id!=="courses"){
-            //     retInsight.code = 404;
-            //     return reject(retInsight);
-            // }
+            if(!(id==="courses"||id==="rooms")){
+                retInsight.code = 404;
+                return reject(retInsight);
+            }
             if(fs.existsSync(id)) {
                 fs.unlinkSync(id);
                 retInsight.code = 204;
