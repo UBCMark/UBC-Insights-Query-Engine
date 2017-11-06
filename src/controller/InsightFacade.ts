@@ -562,6 +562,11 @@ export default class InsightFacade implements IInsightFacade {
                                             newObj[id + "_fail"] = c["Fail"];
                                             newObj[id + "_audit"] = c["Audit"];
                                             newObj[id + "_uuid"] = c["id"];
+                                            if(c["Section"]!=='overall') {
+                                                newObj[id + "_year"] = c["Year"]
+                                            } else {
+                                                newObj[id + "_year"] = "1900"
+                                            }
 
                                             listFiles.push(newObj);
 
