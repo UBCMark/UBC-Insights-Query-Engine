@@ -129,7 +129,7 @@ export default class InsightFacade implements IInsightFacade {
 
                                     newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
                                     newObj[hid + "_address"] = TempInfo[hid + "_address"].trim();
-                                    newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
+                                    newObj[hid + "_seats"] = parseInt(htmlResult.childNodes[3].childNodes[0].value)
                                     newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
                                     newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
                                     newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
@@ -346,6 +346,7 @@ export default class InsightFacade implements IInsightFacade {
     addDataset(id: string, content: string): Promise<InsightResponse> {
         let that = this;
         // return new Promise(function (fulfill, reject) {
+
 
         let insight: InsightResponse = {
             code: null,
@@ -891,12 +892,19 @@ export default class InsightFacade implements IInsightFacade {
                 //         }, {});
                 //     filtereds.push(filtered)
                 // }
-
+                let sortOn =''
                 if (keysForOpt.includes("ORDER")) {
                     let sortOn = options["ORDER"] // string
-                    filtereds.sort(function (a, b) {
-                        return a[sortOn] - b[sortOn]
-                    });
+
+                        filtereds.sort(function (a, b) {
+                            if (a[sortOn] < b[sortOn])
+                                return -1
+                            if ( a[sortOn] > b[sortOn])
+                                return 1
+                            return 0
+
+                        });
+
                 }
 
                 fulfill({code: 200, body: {result: filtereds}})

@@ -1198,8 +1198,8 @@ describe("Test", function() {
             expect(result.body).to.deep.equal({
                 result:
                     [ {rooms_name: 'WOOD_G53', rooms_furniture: 'Classroom-Movable Tables & Chairs', rooms_address: '2194 Health Sciences Mall'},
-                        {rooms_name: 'WOOD_G59', rooms_furniture: 'Classroom-Movable Tables & Chairs', rooms_address: '2194 Health Sciences Mall'},
-                        {rooms_name: 'WOOD_G55', rooms_furniture: 'Classroom-Movable Tables & Chairs', rooms_address: '2194 Health Sciences Mall'}
+                        {rooms_name: 'WOOD_G55', rooms_furniture: 'Classroom-Movable Tables & Chairs', rooms_address: '2194 Health Sciences Mall'},
+                        {rooms_name: 'WOOD_G59', rooms_furniture: 'Classroom-Movable Tables & Chairs', rooms_address: '2194 Health Sciences Mall'}
                     ] });
         }).catch(function (err) {
             Log.test('Error: ' + err);
