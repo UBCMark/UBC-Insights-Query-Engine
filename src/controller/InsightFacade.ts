@@ -66,14 +66,15 @@ export default class InsightFacade implements IInsightFacade {
     }
 
 
-    htmlBuildInfoParse(htmlResult:any, hid:string):Promise<any>{
+    htmlBuildInfoParse(html:any, hid:string):Promise<any>{
 
+        return new Promise(function (fullfil,reject) {
         let retInsight:InsightResponse={
             code:null,
             body:{}
         };
         let that = this;
-        return new Promise(function (f,r) {
+        var htmlResult = parse5.parse(html);
             let newObj: any = {};
             let flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1];
             if (!isUndefined(flag)) {
@@ -100,28 +101,58 @@ export default class InsightFacade implements IInsightFacade {
 
             //pass the result into URL
             // let that = this;
-            let result:any =[]
             http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + addAddress, (res) => {
 
                 res.setEncoding('utf8');
                 let rawData = '';
                 res.on('data', (chunk) => { rawData += chunk; });
                 res.on('end', () => {
-                    try {
+                   // try {
                         let parsedData = JSON.parse(rawData);
                         newObj[hid + "_lat"] = parsedData["lat"];
                         newObj[hid + "_lon"] = parsedData["lon"];
                         TempInfo = newObj;
                         if (validBuildings.includes(TempInfo.rooms_fullname)) {
-                            result = that.htmlRoomInfoParse(htmlResult, gbulidings, newObj, hid);
-                            console.log(result)
+                            let flag = []
+                            var tBody = []
+                            let result:any =[]
+                            try {
+                                flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                                    .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
+                                tBody = flag
+                                for (let i =1; i < tBody.length; i+=2) {
+                                    // let p = new Promise(function (f,r) {
+                                    let newObj: any = {};
+                                    htmlResult = tBody[i]
+                                    newObj[hid + "_fullname"] = TempInfo[hid + "_fullname"].trim();
+                                    newObj[hid + "_shortname"] = gbulidings[newObj[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
+
+                                    newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
+                                    newObj[hid + "_address"] = TempInfo[hid + "_address"].trim();
+                                    newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
+                                    newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
+                                    newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
+                                    newObj[hid + "_name"] = (TempInfo[hid + "_shortname"] + "_" + TempInfo[hid + "_number"]).trim();
+                                    newObj[hid + "_lat"] = TempInfo[hid + "_lat"]
+                                    newObj[hid + "_lon"] = TempInfo[hid + "_lon"]
+                                    newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
+                                    result.push(newObj)
+                                    //})
+                                }
+                                fullfil(result)
+                            } catch  (err) {
+                                fullfil([])
+                            }
+                        } else {
+                            fullfil([])
                         }
-                    } catch (e) {
-                        console.error(e.message);
-                    }
+                   // } catch (e) {
+                   //     reject(e)
+                   //     console.error(e.message);
+                 //   }
                 });
             });
-            f(result)
+
         })
         // if(!isUndefined(htmlResult) && htmlResult!==null && Object.keys(htmlResult).includes("nodeName")) {
         //     if (htmlResult.nodeName === "div" && !isUndefined(htmlResult.attrs[0])&& htmlResult.attrs[0].value.includes("building-info")) {
@@ -200,44 +231,44 @@ export default class InsightFacade implements IInsightFacade {
 
     }
 
-    htmlRoomInfoParse(htmlResult:any,buildings:any, buildInfo:any,hid:string): any[] {
-        let retInsight: InsightResponse = {
-            code: null,
-            body: {}
-        };
-        let that = this;
-        let flag = []
-        var tBody = []
-        let result =[]
-        try {
-            flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-                .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
-            tBody = flag
-            for (let i =1; i < tBody.length; i+=2) {
-               // let p = new Promise(function (f,r) {
-                    let newObj: any = {};
-                    htmlResult = tBody[i]
-                    newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
-                    newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
-
-                    newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
-                    newObj[hid + "_address"] = buildInfo[hid + "_address"].trim();
-                    newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
-                    newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
-                    newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
-                    newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
-                    newObj[hid + "_lat"] = buildInfo[hid + "_lat"]
-                    newObj[hid + "_lon"] = buildInfo[hid + "_lon"]
-                    newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
-                    //f(newObj)
-                    result.push(newObj);
-                //})
-                //pArr.push(p);
-            }
-        } catch  (err) {
-            return []
-        }
-        return result;
+    // htmlRoomInfoParse(htmlResult:any,buildings:any, buildInfo:any,hid:string): any[] {
+    //     let retInsight: InsightResponse = {
+    //         code: null,
+    //         body: {}
+    //     };
+    //     let that = this;
+    //     let flag = []
+    //     var tBody = []
+    //     let result =[]
+    //     try {
+    //         flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+    //             .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
+    //         tBody = flag
+    //         for (let i =1; i < tBody.length; i+=2) {
+    //            // let p = new Promise(function (f,r) {
+    //                 let newObj: any = {};
+    //                 htmlResult = tBody[i]
+    //                 newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
+    //                 newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
+    //
+    //                 newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
+    //                 newObj[hid + "_address"] = buildInfo[hid + "_address"].trim();
+    //                 newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
+    //                 newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
+    //                 newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
+    //                 newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
+    //                 newObj[hid + "_lat"] = buildInfo[hid + "_lat"]
+    //                 newObj[hid + "_lon"] = buildInfo[hid + "_lon"]
+    //                 newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
+    //                 //f(newObj)
+    //                 result.push(newObj);
+    //             //})
+    //             //pArr.push(p);
+    //         }
+    //     } catch  (err) {
+    //         return []
+    //     }
+    //     return result;
        // if (!isUndefined(flag)) {
             //tBody = flag
             // for (let i =1; i < tBody.length; i+=2) {
@@ -295,12 +326,12 @@ export default class InsightFacade implements IInsightFacade {
             // }
         //}
     //}
-    }
+  //  }
 
-    htmlparse(html:any,buildings:any, hid:string): Promise<any>{
-        let that = this
-        var htmlResult = parse5.parse(html);
-        return that.htmlBuildInfoParse(htmlResult,hid);
+    // htmlparse(html:any,buildings:any, hid:string): Promise<any>{
+    //     let that = this
+    //     var htmlResult = parse5.parse(html);
+    //     return that.htmlBuildInfoParse(htmlResult,hid);
 
 
 
@@ -310,7 +341,7 @@ export default class InsightFacade implements IInsightFacade {
         //     this.htmlRoomInfoParse(htmlResult,buildings,TempInfo,hid,roomsInfoList);
         // }
         //return groomsInfoList;
-    };
+    // };
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
         let that = this;
@@ -397,7 +428,7 @@ export default class InsightFacade implements IInsightFacade {
                         listFiles.forEach(function (eachI) {
                             if (that.htmlhelper(eachI)) {
                                 try {
-                                    pArr.push(that.htmlparse(eachI, buildings,id));
+                                    pArr.push(that.htmlBuildInfoParse(eachI,id));
                                 } catch (err) {
                                     console.log(err);
                                 }
@@ -406,9 +437,15 @@ export default class InsightFacade implements IInsightFacade {
 
                         Promise.all(pArr).then(function (data) {
                             console.log(data)
-                        })
+                            for (let i in data) {
+                                let sub:any = data[i]
+                                if (sub.length>0) {
+                                    for (let j in sub){
+                                        groomsInfoList.push(sub[j])
+                                    }
+                                }
 
-
+                            }
                             let BI = JSON.stringify(groomsInfoList);
                             fs.writeFile(id, BI, (fileerr: any, filedata: any) => {
 
@@ -420,6 +457,11 @@ export default class InsightFacade implements IInsightFacade {
 
                                 fulfill(insight);
                             });
+                        }).catch(function (e) {
+                            insight.code = 400;
+                            insight.body = {"error": "can't write the content to disk"};
+                            reject(insight)
+                        })
 
                     }).catch(function (perr: any) {
                         insight.code = 400;
