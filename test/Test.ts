@@ -589,7 +589,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             
             expect(result.body).to.deep.equal({
                 result:
                     [
@@ -638,7 +638,7 @@ describe("Test", function() {
 
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             
             expect(result.body).to.deep.equal({
                 result:
                     [
@@ -874,7 +874,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             
             expect(result.body).to.deep.equal({
                 result:
                     [ { courses_dept: 'adhe', courses_id: '329', courses_avg: 90.02 },
@@ -1136,7 +1136,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             console.log(result.body)
             expect(result.body).to.deep.equal({
                 result:
                     [{rooms_name: 'DMP_101', rooms_type: 'Small Group', rooms_seats: 40},
@@ -1164,7 +1164,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             
             expect(result.body).to.deep.equal({result:
                 [{rooms_name: 'ANGU_037', rooms_number: '037', rooms_address: '2053 Main Mall'},
                     {rooms_name: 'CEME_1202', rooms_number: '1202', rooms_address: '6250 Applied Science Lane'},
@@ -1194,7 +1194,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             
             expect(result.body).to.deep.equal({
                 result:
                     [ {rooms_name: 'WOOD_G53', rooms_furniture: 'Classroom-Movable Tables & Chairs', rooms_address: '2194 Health Sciences Mall'},
@@ -1224,7 +1224,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             
             expect(result.body).to.deep.equal({
                 result: [{
                     "rooms_address": "6363 Agronomy Road",
@@ -1330,7 +1330,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             
             expect(result.body).to.deep.equal({
                         result: [{
                             "rooms_name": "DMP_101"
@@ -1366,7 +1366,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-            console.log(result.body)
+             
             expect(result.body).to.deep.equal({
                 result: [{
                     "rooms_name": "UCLL_101"
@@ -1447,6 +1447,26 @@ describe("Test", function() {
         });
     });
 
+    it("RtestComplexOr AfterRemove", function() {
+        return IF.performQuery({
+                "WHERE":{
+                    "OR": [{"EQ":{"rooms_seats":100}},{"IS":{"rooms_name":"ANGU_037"}}]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "rooms_name",
+                        "rooms_number","rooms_address"
+                    ],
+                    "ORDER":"rooms_number"
+                }
+            }
+        ).then(function (result: any) {
+            expect.fail()
+        }).catch(function (err) {
+           expect(err.code).eq(424)
+            console.log('after remove' + err)
+        })
+    });
 
 
 })

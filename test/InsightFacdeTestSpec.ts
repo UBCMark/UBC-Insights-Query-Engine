@@ -66,10 +66,20 @@ describe("InsightFacadeSpec", function () {
         });
     });
 
+    it('Test for an mismatch1.', function () {
+        return insightFacade.addDataset("course", content2).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+
     it("test addDataset courses.zip", function () {
         return insightFacade.addDataset("courses", content).then(function (data) {
             expect(fs.existsSync("courses")).eq(true);
             expect(data.code).eq(204);
+            console.log(data.code)
         }).catch(function (err) {
             console.log(err);
 
@@ -88,6 +98,14 @@ describe("InsightFacadeSpec", function () {
 
     it('Test for an invalid ID.', function () {
         return insightFacade.addDataset("room", content2).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+    it('Test for an mismatch2.', function () {
+        return insightFacade.addDataset("rooms", content).then(function (response: InsightResponse) {
             expect.fail();
         }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(400);

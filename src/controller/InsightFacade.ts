@@ -368,15 +368,6 @@ export default class InsightFacade implements IInsightFacade {
 
         }
 
-        // if (fs.existsSync(id)) {
-        //     insight.code = 201;
-        //     insight.body = {"success": "exist"};
-        //
-        // } else {
-        //     insight.code = 204;
-        //     insight.body = {"success": "not exist"};
-        //
-        // }
 
 
         if (id === "rooms") {
@@ -396,6 +387,7 @@ export default class InsightFacade implements IInsightFacade {
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
                     let listPromiseFiles: any[] = [];
 
+
                     data.forEach(function (r: any, f: any) {
 
                         listPromiseFiles.push(f.async("string"));
@@ -404,13 +396,16 @@ export default class InsightFacade implements IInsightFacade {
 
                     let listFiles: any[] = [];
                     Promise.all(listPromiseFiles).then(function (htmldata) {
-                        for (let i = 6; i < 82; i++) {
-                            listFiles.push(htmldata[i])
-                        }
+
+                            for (let i = 6; i < 82; i++) {
+                                listFiles.push(htmldata[i])
+                            }
+
 
                         let indexJS = htmldata[82];
 
                         const document = parse5.parse(indexJS);
+
                         let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
                             .childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes[1]
                             .childNodes[3];
@@ -463,9 +458,10 @@ export default class InsightFacade implements IInsightFacade {
                                 }
 
                             }
+
                             let xyz = JSON.stringify(roomsInfoList);
-                            if (fs.existsSync(id)) {fulfill(insight)}
-                            else {fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
+
+                            fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
                                 if (fileerr) {
                                     insight.code = 400;
@@ -474,7 +470,7 @@ export default class InsightFacade implements IInsightFacade {
                                 }
 
                                 fulfill(insight);
-                            });}
+                            });
                         }).catch(function (e) {
                             insight.code = 400;
                             insight.body = {"error": "can't write the content to disk"};
@@ -856,6 +852,7 @@ export default class InsightFacade implements IInsightFacade {
             if(fs.existsSync(id)) {
                 fs.unlinkSync(id);
                 retInsight.code = 204;
+                dataset[id] = []
                 fulfill(retInsight);
             }else{
                 retInsight.code = 404;
@@ -884,7 +881,7 @@ export default class InsightFacade implements IInsightFacade {
 
                  let result: any[] = []
                 try {
-                        if (!Object.keys(dataset).includes(id)) {
+                        if (!Object.keys(dataset).includes(id) || dataset[id].length === 0) {
                             dataset[id] = JSON.parse(fs.readFileSync(id))
                         }
 
