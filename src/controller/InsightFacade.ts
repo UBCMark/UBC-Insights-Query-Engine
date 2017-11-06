@@ -66,62 +66,111 @@ export default class InsightFacade implements IInsightFacade {
     }
 
 
-    htmlBuildInfoParse(htmlResult:any, hid:string){
+    htmlBuildInfoParse(htmlResult:any, hid:string):Promise<any>{
 
         let retInsight:InsightResponse={
             code:null,
             body:{}
         };
         let that = this;
+        return new Promise(function (f,r) {
+            let newObj: any = {};
+            let flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1];
+            if (!isUndefined(flag)) {
+                newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
+                newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
 
+//get the address in the rightformat
+                var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+            }else {
+                newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
+                newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+
+//get the address in the rightformat
+                var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+            }
+
+            var addAddress:string = querystring.escape(vaddress);
+
+            //pass the result into URL
+            // let that = this;
+            let result:any =[]
+            http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + addAddress, (res) => {
+
+                res.setEncoding('utf8');
+                let rawData = '';
+                res.on('data', (chunk) => { rawData += chunk; });
+                res.on('end', () => {
+                    try {
+                        let parsedData = JSON.parse(rawData);
+                        newObj[hid + "_lat"] = parsedData["lat"];
+                        newObj[hid + "_lon"] = parsedData["lon"];
+                        TempInfo = newObj;
+                        if (validBuildings.includes(TempInfo.rooms_fullname)) {
+                            result = that.htmlRoomInfoParse(htmlResult, gbulidings, newObj, hid);
+                            console.log(result)
+                        }
+                    } catch (e) {
+                        console.error(e.message);
+                    }
+                });
+            });
+            f(result)
+        })
         // if(!isUndefined(htmlResult) && htmlResult!==null && Object.keys(htmlResult).includes("nodeName")) {
         //     if (htmlResult.nodeName === "div" && !isUndefined(htmlResult.attrs[0])&& htmlResult.attrs[0].value.includes("building-info")) {
         //         count++
-                let newObj: any = {};
-                let flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1];
-                if (!isUndefined(flag)) {
-                    newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-                        .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
-                    newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-                        .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
-
-//get the address in the rightformat
-                    var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-                        .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
-                }else {
-                    newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
-                        .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
-                    newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
-                        .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
-
-//get the address in the rightformat
-                    var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
-                        .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
-                }
-
-                var addAddress:string = querystring.escape(vaddress);
-
-                //pass the result into URL
-                    // let that = this;
-                http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + addAddress, (res) => {
-
-                    res.setEncoding('utf8');
-                    let rawData = '';
-                    res.on('data', (chunk) => { rawData += chunk; });
-                    res.on('end', () => {
-                        try {
-                            let parsedData = JSON.parse(rawData);
-                            newObj[hid + "_lat"] = parsedData["lat"];
-                            newObj[hid + "_lon"] = parsedData["lon"];
-                            TempInfo = newObj;
-                            if (validBuildings.includes(TempInfo.rooms_fullname)) {
-                                that.htmlRoomInfoParse(htmlResult, gbulidings, newObj, hid);
-                            }
-                        } catch (e) {
-                            console.error(e.message);
-                        }
-                    });
-                });
+//                 let newObj: any = {};
+//                 let flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1];
+//                 if (!isUndefined(flag)) {
+//                     newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
+//                     newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+//
+// //get the address in the rightformat
+//                     var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+//                 }else {
+//                     newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
+//                     newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+//
+// //get the address in the rightformat
+//                     var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+//                 }
+//
+//                 var addAddress:string = querystring.escape(vaddress);
+//
+//                 //pass the result into URL
+//                     // let that = this;
+//                 http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + addAddress, (res) => {
+//
+//                     res.setEncoding('utf8');
+//                     let rawData = '';
+//                     res.on('data', (chunk) => { rawData += chunk; });
+//                     res.on('end', () => {
+//                         try {
+//                             let parsedData = JSON.parse(rawData);
+//                             newObj[hid + "_lat"] = parsedData["lat"];
+//                             newObj[hid + "_lon"] = parsedData["lon"];
+//                             TempInfo = newObj;
+//                             if (validBuildings.includes(TempInfo.rooms_fullname)) {
+//                                 that.htmlRoomInfoParse(htmlResult, gbulidings, newObj, hid);
+//                             }
+//                         } catch (e) {
+//                             console.error(e.message);
+//                         }
+//                     });
+//                 });
 
                 /*
                 http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + address, res => {
@@ -151,7 +200,7 @@ export default class InsightFacade implements IInsightFacade {
 
     }
 
-    htmlRoomInfoParse(htmlResult:any,buildings:any, buildInfo:any,hid:string) {
+    htmlRoomInfoParse(htmlResult:any,buildings:any, buildInfo:any,hid:string): any[] {
         let retInsight: InsightResponse = {
             code: null,
             body: {}
@@ -159,14 +208,15 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         let flag = []
         var tBody = []
+        let result =[]
         try {
             flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
                 .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
             tBody = flag
             for (let i =1; i < tBody.length; i+=2) {
-                let p = new Promise(function (f,r) {
+               // let p = new Promise(function (f,r) {
                     let newObj: any = {};
-                    htmlResult = this.tBody[i]
+                    htmlResult = tBody[i]
                     newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
                     newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
 
@@ -179,19 +229,15 @@ export default class InsightFacade implements IInsightFacade {
                     newObj[hid + "_lat"] = buildInfo[hid + "_lat"]
                     newObj[hid + "_lon"] = buildInfo[hid + "_lon"]
                     newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
-                    f(newObj)
-                    groomsInfoList.push(newObj);
-
-                    let resList:any[] = [];
-                    Promise.all(groomsInfoList).then(function (fillData) {
-                        resList = fillData;
-
-                    })
-                })
-                pArr.push(p);
+                    //f(newObj)
+                    result.push(newObj);
+                //})
+                //pArr.push(p);
             }
         } catch  (err) {
+            return []
         }
+        return result;
        // if (!isUndefined(flag)) {
             //tBody = flag
             // for (let i =1; i < tBody.length; i+=2) {
@@ -251,10 +297,12 @@ export default class InsightFacade implements IInsightFacade {
     //}
     }
 
-    htmlparse(html:any,buildings:any, hid:string):any{
+    htmlparse(html:any,buildings:any, hid:string): Promise<any>{
+        let that = this
         var htmlResult = parse5.parse(html);
+        return that.htmlBuildInfoParse(htmlResult,hid);
 
-        this.htmlBuildInfoParse(htmlResult,hid);
+
 
         // var roomsInfoList:any[] = [];
         // console.log(TempInfo);
@@ -346,19 +394,19 @@ export default class InsightFacade implements IInsightFacade {
 
                         let allBuildingsInfoList: any[] = [];
 
-                            for (let eachI of listFiles) {
-                                if (that.htmlhelper(eachI)) {
-                                    try {
-                                        that.htmlparse(eachI, buildings,id);
-                                    } catch (err) {
-                                        console.log(err);
-                                    }
+                        listFiles.forEach(function (eachI) {
+                            if (that.htmlhelper(eachI)) {
+                                try {
+                                    pArr.push(that.htmlparse(eachI, buildings,id));
+                                } catch (err) {
+                                    console.log(err);
                                 }
                             }
-                            Promise.all(pArr).then(function (data) {
-                                console.log(data)
-                            })
+                        })
 
+                        Promise.all(pArr).then(function (data) {
+                            console.log(data)
+                        })
 
 
                             let BI = JSON.stringify(groomsInfoList);
