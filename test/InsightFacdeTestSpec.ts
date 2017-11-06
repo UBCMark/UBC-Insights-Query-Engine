@@ -47,25 +47,25 @@ describe("InsightFacadeSpec", function () {
     afterEach(function () {
         insightFacade = null;
     });
-   //
-   // it('Test for an empty courses.', function () {
-   //
-   //      return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
-   //          expect.fail();
-   //
-   //      }).catch(function (response: InsightResponse) {
-   //          expect(response.code).to.equal(400);
-   //      });
-   // });
-   //
-   //  it('Test for an invalid ID.', function () {
-   //      return insightFacade.addDataset("course", content).then(function (response: InsightResponse) {
-   //          expect.fail();
-   //      }).catch(function (response: InsightResponse) {
-   //          expect(response.code).to.equal(400);
-   //      });
-   //  });
-   //
+
+   it('Test for an empty courses.', function () {
+
+        return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
+            expect.fail();
+
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+   });
+
+    it('Test for an invalid ID.', function () {
+        return insightFacade.addDataset("course", content).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
     it("test addDataset courses.zip", function () {
         return insightFacade.addDataset("courses", content).then(function (data) {
             expect(fs.existsSync("courses")).eq(true);
@@ -75,24 +75,24 @@ describe("InsightFacadeSpec", function () {
 
         });
     });
-   //
-   //  it("test addDataset204/201", function () {
-   //
-   //      return insightFacade.addDataset("courses", content).then(function (data) {
-   //          expect(data.code).eq(201);
-   //      }).catch(function (err) {
-   //          console.log(err);
-   //      });
-   //
-   //  });
-   //
-   //  it('Test for an invalid ID.', function () {
-   //      return insightFacade.addDataset("room", content2).then(function (response: InsightResponse) {
-   //          expect.fail();
-   //      }).catch(function (response: InsightResponse) {
-   //          expect(response.code).to.equal(400);
-   //      });
-   //  });
+
+    it("test addDataset204/201", function () {
+
+        return insightFacade.addDataset("courses", content).then(function (data) {
+            expect(data.code).eq(201);
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+    });
+
+    it('Test for an invalid ID.', function () {
+        return insightFacade.addDataset("room", content2).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
 
     it("test addDataset rooms.zip", function () {
         return insightFacade.addDataset("rooms", content2).then(function (data) {
@@ -104,14 +104,14 @@ describe("InsightFacadeSpec", function () {
         });
     });
 
-    // it("test addDataset204/201", function () {
-    //
-    //     return insightFacade.addDataset("rooms", content2).then(function (data) {
-    //         expect(data.code).eq(201);
-    //     }).catch(function (err) {
-    //         console.log(err);
-    //     });
-    //
-    // });
+    it("test addDataset204/201", function () {
+
+        return insightFacade.addDataset("rooms", content2).then(function (data) {
+            expect(data.code).eq(201);
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+    });
 
 });

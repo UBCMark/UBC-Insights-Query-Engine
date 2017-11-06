@@ -1136,6 +1136,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
+            console.log(result.body)
             expect(result.body).to.deep.equal({
                 result:
                     [{rooms_name: 'DMP_101', rooms_type: 'Small Group', rooms_seats: 40},
@@ -1350,8 +1351,8 @@ describe("Test", function() {
     });
 
 
-
-    // remove
+    //
+    // // remove
     it("test removeDataset", function () {
 
         IF.removeDataset("courses").then(function (data) {
@@ -1382,34 +1383,34 @@ describe("Test", function() {
         });
     });
 
-    // it("test removeDataset", function () {
-    //
-    //     IF.removeDataset("rooms").then(function (data) {
-    //         expect(fs.existsSync("rooms")).eq(false);
-    //         expect(data.code).eq(204);
-    //
-    //     }).catch(function (err) {
-    //         console.log(err);
-    //     })
-    // });
-    //
-    //
-    // it("test removeDatasetwithWrongID", function () {
-    //     IF.removeDataset("room").then(function (data) {
-    //         expect.fail();
-    //     }).catch(function (err) {
-    //         expect(fs.existsSync("rooms")).eq(false);
-    //         expect(err.code).eq(404);
-    //     });
-    // });
-    //
-    // it("test removeDatasetAgain", function () {
-    //     IF.removeDataset("rooms").then(function (data) {
-    //         expect.fail();
-    //     }).catch(function (err) {
-    //         expect(fs.existsSync("rooms")).eq(false);
-    //         expect(err.code).eq(404);
-    //     });
-    // });
+    it("test removeDataset", function () {
+
+        IF.removeDataset("rooms").then(function (data) {
+            expect(fs.existsSync("rooms")).eq(false);
+            expect(data.code).eq(204);
+
+        }).catch(function (err) {
+            console.log(err);
+        })
+    });
+
+
+    it("test removeDatasetwithWrongID", function () {
+        IF.removeDataset("room").then(function (data) {
+            expect.fail();
+        }).catch(function (err) {
+            expect(fs.existsSync("rooms")).eq(false);
+            expect(err.code).eq(404);
+        });
+    });
+
+    it("test removeDatasetAgain", function () {
+        IF.removeDataset("rooms").then(function (data) {
+            expect.fail();
+        }).catch(function (err) {
+            expect(fs.existsSync("rooms")).eq(false);
+            expect(err.code).eq(404);
+        });
+    });
 
 })

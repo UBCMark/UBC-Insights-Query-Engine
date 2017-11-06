@@ -38,7 +38,7 @@ var dataset:any = {}
 var TempInfo:any = {}
 let count = 0;
 let validBuildings:any = []
-var groomsInfoList:any[] = [];
+let groomsInfoList:any[] = [];
 var gbulidings:any = {}
 var pArr:any = []
 
@@ -132,7 +132,7 @@ export default class InsightFacade implements IInsightFacade {
                                     newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
                                     newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
                                     newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
-                                    newObj[hid + "_name"] = (TempInfo[hid + "_shortname"] + "_" + TempInfo[hid + "_number"]).trim();
+                                    newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
                                     newObj[hid + "_lat"] = TempInfo[hid + "_lat"]
                                     newObj[hid + "_lon"] = TempInfo[hid + "_lon"]
                                     newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
@@ -378,6 +378,7 @@ export default class InsightFacade implements IInsightFacade {
 
         if (id === "rooms") {
             return new Promise(function (fulfill, reject) {
+                if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
                     let listPromiseFiles: any[] = [];
 
@@ -420,7 +421,7 @@ export default class InsightFacade implements IInsightFacade {
                         }
                         gbulidings = buildings
                         validBuildings = Object.keys(buildings)
-                        console.log(validBuildings);
+                       // console.log(validBuildings);
 
 
                         let allBuildingsInfoList: any[] = [];
@@ -435,19 +436,21 @@ export default class InsightFacade implements IInsightFacade {
                             }
                         })
 
+                        let roomsInfoList:any[] = []
                         Promise.all(pArr).then(function (data) {
-                            console.log(data)
+                            //console.log(data)
                             for (let i in data) {
                                 let sub:any = data[i]
                                 if (sub.length>0) {
                                     for (let j in sub){
-                                        groomsInfoList.push(sub[j])
+                                        roomsInfoList.push(sub[j])
                                     }
                                 }
 
                             }
-                            let BI = JSON.stringify(groomsInfoList);
-                            fs.writeFile(id, BI, (fileerr: any, filedata: any) => {
+                            let xyz = JSON.stringify(roomsInfoList);
+                            if (fs.existsSync(id)) {fulfill(insight)}
+                            else {fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
                                 if (fileerr) {
                                     insight.code = 400;
@@ -456,7 +459,7 @@ export default class InsightFacade implements IInsightFacade {
                                 }
 
                                 fulfill(insight);
-                            });
+                            });}
                         }).catch(function (e) {
                             insight.code = 400;
                             insight.body = {"error": "can't write the content to disk"};
@@ -520,7 +523,9 @@ export default class InsightFacade implements IInsightFacade {
         // }
 
         if (id === "courses") {
+
             return new Promise(function (fulfill, reject) {
+                if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) { // data is zipObject
 
                     let listPromiseFiles: any[] = [];
@@ -566,16 +571,18 @@ export default class InsightFacade implements IInsightFacade {
                         }
 
                         let xyz = JSON.stringify(listFiles);
-                        fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
-                            if (fileerr) {
-                                insight.code = 400;
-                                insight.body = {"error": "can't write the content to disk"};
-                                return reject(insight);
-                            }
+                            fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
-                            fulfill(insight);
-                        });
+                                if (fileerr) {
+                                    insight.code = 400;
+                                    insight.body = {"error": "can't write the content to disk"};
+                                    return reject(insight);
+                                }
+
+                                fulfill(insight);
+                            });
+
                     }).catch(function (perr: any) {
                         insight.code = 400;
                         insight.body = {"error": "can't write the content to disk"};
