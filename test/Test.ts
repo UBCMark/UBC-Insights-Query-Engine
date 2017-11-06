@@ -1382,4 +1382,34 @@ describe("Test", function() {
         });
     });
 
+    // it("test removeDataset", function () {
+    //
+    //     IF.removeDataset("rooms").then(function (data) {
+    //         expect(fs.existsSync("rooms")).eq(false);
+    //         expect(data.code).eq(204);
+    //
+    //     }).catch(function (err) {
+    //         console.log(err);
+    //     })
+    // });
+    //
+    //
+    // it("test removeDatasetwithWrongID", function () {
+    //     IF.removeDataset("room").then(function (data) {
+    //         expect.fail();
+    //     }).catch(function (err) {
+    //         expect(fs.existsSync("rooms")).eq(false);
+    //         expect(err.code).eq(404);
+    //     });
+    // });
+    //
+    // it("test removeDatasetAgain", function () {
+    //     IF.removeDataset("rooms").then(function (data) {
+    //         expect.fail();
+    //     }).catch(function (err) {
+    //         expect(fs.existsSync("rooms")).eq(false);
+    //         expect(err.code).eq(404);
+    //     });
+    // });
+
 })

@@ -54,19 +54,19 @@ describe("EchoSpec", function () {
     content = fs.readFileSync("./rooms.zip", {encoding: "base64"})
     console.log(content)
 
-    it("Test", function () {
-        return IF.addDataset("rooms", content).then(function (data) {
-            let dataset: any = {};
-            let id = "rooms"
-            let id2 = "courses"
-            dataset["rooms"] = 123;
-            dataset[id2] = 321
-            console.log(dataset)
-            console.log('success')
-        }).catch(function (err) {
-            console.log('testfail')
-        })
-    });
+    // it("Test", function () {
+    //     return IF.addDataset("rooms", content).then(function (data) {
+    //         let dataset: any = {};
+    //         let id = "rooms"
+    //         let id2 = "courses"
+    //         dataset["rooms"] = 123;
+    //         dataset[id2] = 321
+    //         console.log(dataset)
+    //         console.log('success')
+    //     }).catch(function (err) {
+    //         console.log('testfail')
+    //     })
+    // });
 
 
     it("Test2", function () {
