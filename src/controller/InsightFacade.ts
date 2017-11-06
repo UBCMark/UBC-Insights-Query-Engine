@@ -378,9 +378,6 @@ export default class InsightFacade implements IInsightFacade {
         //
         // }
 
-        // process the content (ie getting the info you want)
-        // store it into data structure
-        // save data structure to disk (using fs.writeFile)
 
         if (id === "rooms") {
             return new Promise(function (fulfill, reject) {
@@ -410,6 +407,7 @@ export default class InsightFacade implements IInsightFacade {
                         for (let i = 6; i < 82; i++) {
                             listFiles.push(htmldata[i])
                         }
+
                         let indexJS = htmldata[82];
 
                         const document = parse5.parse(indexJS);
