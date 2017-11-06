@@ -377,8 +377,7 @@ export default class InsightFacade implements IInsightFacade {
         //     insight.body = {"success": "not exist"};
         //
         // }
-
-
+        
         if (id === "rooms") {
             return new Promise(function (fulfill, reject) {
 
