@@ -563,9 +563,9 @@ export default class InsightFacade implements IInsightFacade {
                                             newObj[id + "_audit"] = c["Audit"];
                                             newObj[id + "_uuid"] = c["id"];
                                             if(c["Section"]!=='overall') {
-                                                newObj[id + "_year"] = c["Year"]
+                                                newObj[id + "_year"] = parseInt(c["Year"])
                                             } else {
-                                                newObj[id + "_year"] = "1900"
+                                                newObj[id + "_year"] = 1900
                                             }
 
                                             listFiles.push(newObj);
@@ -969,7 +969,7 @@ export default class InsightFacade implements IInsightFacade {
 
     ismKey1(k: any): boolean {
         if (typeof k !== 'string') return false
-        return (k === 'courses_avg')||(k === 'courses_pass')||(k === 'courses_fail')||(k === 'courses_audit')
+        return (k === 'courses_avg')||(k === 'courses_pass')||(k === 'courses_fail')||(k === 'courses_audit')||(k === 'courses_year')
     }
 
     issKey1(k: any): boolean {
