@@ -9,6 +9,7 @@ describe("InsightFacadeSpec", function () {
     let insightFacade: InsightFacade = null;
 
     let content: string = "";
+    let content2: string = "";
     let contentEmpty: string = "";
     //let fileDirectory:string = __dirname.replace("test/","");
     //let fileDirectory = 'C:/A  UBC Study/a 2017/310/cpsc310_team70';
@@ -18,6 +19,14 @@ describe("InsightFacadeSpec", function () {
             throw err;
         } else {
             content = data;
+        }
+    });
+
+    fs.readFile("./rooms.zip", {encoding: "base64"}, function (err: any, data: any) {
+        if (err) {
+            throw err;
+        } else {
+            content2 = data;
         }
     });
 
@@ -40,8 +49,10 @@ describe("InsightFacadeSpec", function () {
     });
 
     it('Test for an empty courses.', function () {
+
         return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
             expect.fail();
+
         }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(400);
         });
@@ -74,5 +85,34 @@ describe("InsightFacadeSpec", function () {
         });
 
     });
+
+    it('Test for an invalid ID.', function () {
+        return insightFacade.addDataset("room", content2).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+    it("test addDataset rooms.zip", function () {
+        return insightFacade.addDataset("rooms", content2).then(function (data) {
+            expect(fs.existsSync("rooms")).eq(true);
+            expect(data.code).eq(204);
+        }).catch(function (err) {
+            console.log(err);
+
+        });
+    });
+
+    it("test addDataset204/201", function () {
+
+        return insightFacade.addDataset("rooms", content2).then(function (data) {
+            expect(data.code).eq(201);
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+    });
+
 
 });

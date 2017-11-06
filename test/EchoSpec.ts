@@ -1,7 +1,7 @@
 /**
  * Created by rtholmes on 2016-10-31.
  */
-var fs = require("fs");
+import fs = require("fs");
 import Server from "../src/rest/Server";
 import {expect} from 'chai';
 import Log from "../src/Util";
@@ -11,8 +11,13 @@ import chai = require('chai');
 import chaiHttp = require('chai-http');
 import Response = ChaiHttp.Response;
 import restify = require('restify');
+let jsz = require("jszip");
+const parse5 = require('parse5');
+
+
 
 describe("EchoSpec", function () {
+    this.timeout(10000);
 
 
     function sanityCheck(response: InsightResponse) {
@@ -23,7 +28,8 @@ describe("EchoSpec", function () {
 
     var IF: InsightFacade = null;
     beforeEach(function () {
-         IF = new InsightFacade();
+        IF = new InsightFacade();
+
     });
 
 
@@ -43,6 +49,47 @@ describe("EchoSpec", function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
     });
 
+    // let content: string = "";
+    //
+    // content = fs.readFileSync("./rooms.zip", {encoding: "base64"})
+    // console.log(content)
+
+    // it("Test", function () {
+    //     return IF.addDataset("rooms", content).then(function (data) {
+    //         let dataset: any = {};
+    //         let id = "rooms"
+    //         let id2 = "courses"
+    //         dataset["rooms"] = 123;
+    //         dataset[id2] = 321
+    //         console.log(dataset)
+    //         console.log('success')
+    //     }).catch(function (err) {
+    //         console.log('testfail')
+    //     })
+    // });
+
+
+    // it("Test2", function () {
+    //     return IF.performQuery({
+    //         "WHERE": {
+    //             "IS": {
+    //                 "rooms_name": "DMP_*"
+    //             }
+    //         },
+    //         "OPTIONS": {
+    //             "COLUMNS": [
+    //                 "rooms_name"
+    //             ],
+    //             "ORDER": "rooms_name"
+    //         }
+    //     }).then(function (data) {
+    //         console.log('query success')
+    //     }).catch(function (err) {
+    //         console.log('query testfail')
+    //     })
+    // });
+
+    //
     it("Should be able to echo", function () {
         let out = Server.performEcho('echo');
         Log.test(JSON.stringify(out));
@@ -75,7 +122,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.have.property('error');
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
-
+    //
     it("Test Server", function() {
 
         // Init

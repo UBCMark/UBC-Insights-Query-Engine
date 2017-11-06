@@ -4,11 +4,16 @@
 import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 var fs  = require('fs');
 import Log from "../Util";
+import keys = require("core-js/fn/array/keys");
 var fs = require("fs");
 
 var JSZip = require("jszip");
 
 let jsz = require("jszip");
+const parse5 = require('parse5');
+import * as http from "http";
+import {isUndefined} from "util";
+const querystring = require('querystring');
 
 
 interface MyObj{
@@ -29,6 +34,14 @@ interface retQuery{
     options: any;
 }
 
+var dataset:any = {}
+var TempInfo:any = {}
+let count = 0;
+let validBuildings:any = []
+let groomsInfoList:any[] = [];
+var gbulidings:any = {}
+var pArr:any = []
+
 export default class InsightFacade implements IInsightFacade {
 
     constructor() {
@@ -43,80 +56,576 @@ export default class InsightFacade implements IInsightFacade {
             return false;}
     };
 
+    htmlhelper(htmlobj:any):boolean{
+        try{
+            parse5.parse(htmlobj);
+            return true;
+        }catch(err){
+            return false;
+        }
+    }
+
+
+    htmlBuildInfoParse(html:any, hid:string):Promise<any>{
+
+        return new Promise(function (fullfil,reject) {
+            let retInsight:InsightResponse={
+                code:null,
+                body:{}
+            };
+            let that = this;
+            var htmlResult = parse5.parse(html);
+            let newObj: any = {};
+            let flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1];
+            if (!isUndefined(flag)) {
+                newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
+                newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+
+//get the address in the rightformat
+                var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+            }else {
+                newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
+                newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+
+//get the address in the rightformat
+                var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+                    .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+            }
+
+            var addAddress:string = querystring.escape(vaddress);
+
+            //pass the result into URL
+            // let that = this;
+            http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + addAddress, (res) => {
+
+                res.setEncoding('utf8');
+                let rawData = '';
+                res.on('data', (chunk) => { rawData += chunk; });
+                res.on('end', () => {
+                    // try {
+                    let parsedData = JSON.parse(rawData);
+                    newObj[hid + "_lat"] = parsedData["lat"];
+                    newObj[hid + "_lon"] = parsedData["lon"];
+                    TempInfo = newObj;
+                    if (validBuildings.includes(TempInfo.rooms_fullname)) {
+                        let flag = []
+                        var tBody = []
+                        let result:any =[]
+                        try {
+                            if (TempInfo[hid + "_fullname"] !== "The Leon and Thea Koerner University Centre") {
+                                flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+                                    .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
+                            } else {
+                                flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+                                    .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
+                            }
+                            tBody = flag
+                            for (let i =1; i < tBody.length; i+=2) {
+                                // let p = new Promise(function (f,r) {
+                                let newObj: any = {};
+                                htmlResult = tBody[i]
+                                newObj[hid + "_fullname"] = TempInfo[hid + "_fullname"].trim();
+                                newObj[hid + "_shortname"] = gbulidings[newObj[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
+
+                                newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
+                                newObj[hid + "_address"] = TempInfo[hid + "_address"].trim();
+                                newObj[hid + "_seats"] = parseInt(htmlResult.childNodes[3].childNodes[0].value)
+                                newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
+                                newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
+                                newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
+                                newObj[hid + "_lat"] = TempInfo[hid + "_lat"]
+                                newObj[hid + "_lon"] = TempInfo[hid + "_lon"]
+                                newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
+                                result.push(newObj)
+                                //})
+                            }
+                            fullfil(result)
+                        } catch  (err) {
+                            fullfil([])
+                        }
+                    } else {
+                        fullfil([])
+                    }
+                    // } catch (e) {
+                    //     reject(e)
+                    //     console.error(e.message);
+                    //   }
+                });
+            });
+
+        })
+        // if(!isUndefined(htmlResult) && htmlResult!==null && Object.keys(htmlResult).includes("nodeName")) {
+        //     if (htmlResult.nodeName === "div" && !isUndefined(htmlResult.attrs[0])&& htmlResult.attrs[0].value.includes("building-info")) {
+        //         count++
+//                 let newObj: any = {};
+//                 let flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1];
+//                 if (!isUndefined(flag)) {
+//                     newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
+//                     newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+//
+// //get the address in the rightformat
+//                     var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+//                 }else {
+//                     newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
+//                     newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+//
+// //get the address in the rightformat
+//                     var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
+//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
+//                 }
+//
+//                 var addAddress:string = querystring.escape(vaddress);
+//
+//                 //pass the result into URL
+//                     // let that = this;
+//                 http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + addAddress, (res) => {
+//
+//                     res.setEncoding('utf8');
+//                     let rawData = '';
+//                     res.on('data', (chunk) => { rawData += chunk; });
+//                     res.on('end', () => {
+//                         try {
+//                             let parsedData = JSON.parse(rawData);
+//                             newObj[hid + "_lat"] = parsedData["lat"];
+//                             newObj[hid + "_lon"] = parsedData["lon"];
+//                             TempInfo = newObj;
+//                             if (validBuildings.includes(TempInfo.rooms_fullname)) {
+//                                 that.htmlRoomInfoParse(htmlResult, gbulidings, newObj, hid);
+//                             }
+//                         } catch (e) {
+//                             console.error(e.message);
+//                         }
+//                     });
+//                 });
+
+        /*
+        http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + address, res => {
+            //  const geoInfo = res;
+            if (res.error.length !== 0) {
+                retInsight.code = 404;
+                retInsight.body = {"error": "not a valid address"};
+                return retInsight;
+            } else {
+                newObj[hid + "_lat"] = res.lat;
+                newObj[hid + "_lon"] = res.lon;
+            }
+        });
+        */
+
+        //     buildInfo = newObj;
+        //     TempInfo = newObj;
+
+        // }else{
+        //     if (Object.keys(htmlResult).includes("childNodes")) {
+        //         for (let i = 0; i<htmlResult.childNodes.length; i++) {
+        //             this.htmlBuildInfoParse(htmlResult.childNodes[i], hid, buildInfo);
+        //         }
+        //     }
+        // }
+        //}
+
+    }
+
+    // htmlRoomInfoParse(htmlResult:any,buildings:any, buildInfo:any,hid:string): any[] {
+    //     let retInsight: InsightResponse = {
+    //         code: null,
+    //         body: {}
+    //     };
+    //     let that = this;
+    //     let flag = []
+    //     var tBody = []
+    //     let result =[]
+    //     try {
+    //         flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
+    //             .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
+    //         tBody = flag
+    //         for (let i =1; i < tBody.length; i+=2) {
+    //            // let p = new Promise(function (f,r) {
+    //                 let newObj: any = {};
+    //                 htmlResult = tBody[i]
+    //                 newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
+    //                 newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
+    //
+    //                 newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
+    //                 newObj[hid + "_address"] = buildInfo[hid + "_address"].trim();
+    //                 newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
+    //                 newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
+    //                 newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
+    //                 newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
+    //                 newObj[hid + "_lat"] = buildInfo[hid + "_lat"]
+    //                 newObj[hid + "_lon"] = buildInfo[hid + "_lon"]
+    //                 newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
+    //                 //f(newObj)
+    //                 result.push(newObj);
+    //             //})
+    //             //pArr.push(p);
+    //         }
+    //     } catch  (err) {
+    //         return []
+    //     }
+    //     return result;
+    // if (!isUndefined(flag)) {
+    //tBody = flag
+    // for (let i =1; i < tBody.length; i+=2) {
+    //     let newObj: any = {};
+    //     htmlResult = tBody[i]
+    //     newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
+    //     newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
+    //
+    //     newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
+    //     newObj[hid + "_address"] = buildInfo[hid + "_address"].trim();
+    //     newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
+    //     newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
+    //     newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
+    //     newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
+    //     newObj[hid + "_lat"] = buildInfo[hid + "_lat"]
+    //     newObj[hid + "_lon"] = buildInfo[hid + "_lon"]
+    //     newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
+    //     groomsInfoList.push(newObj);
+    // }
+
+    //  }
+    // if (!isUndefined(htmlResult) && htmlResult!==null && Object.keys(htmlResult).includes("nodeName")) {
+    //
+    //     if (htmlResult.nodeName === "tr" &&!isUndefined(htmlResult.attrs[0])&& (htmlResult.attrs[0].value.includes("odd") || htmlResult.attrs[0].value.includes("even"))) {
+
+    //  if (typeof htmlResult === 'object') {   ///keep of not?
+    //       let newObj: any = {};
+    //
+    //
+    //       newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
+    //       newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
+    //
+    //       newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
+    //       newObj[hid + "_address"] = buildInfo[hid + "_address"].trim();
+    //       newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
+    //       newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
+    //       newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
+    //       newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
+    //
+    //       newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
+
+
+
+    // newObj[hid + "_lat"] = buildInfo[hid + "_lat"].trim();
+    // newObj[hid + "_lon"] = buildInfo[hid + "_lon"].trim();
+
+    // groomsInfoList.push(newObj);
+
+    //  }
+    // } else{
+    //     if (Object.keys(htmlResult).includes("childNodes")) {
+    //         for (let i = 0; i<htmlResult.childNodes.length; i++) {
+    //             this.htmlRoomInfoParse(htmlResult.childNodes[i],buildings, buildInfo, hid);
+    //         }
+    // }
+    //}
+    //}
+    //  }
+
+    // htmlparse(html:any,buildings:any, hid:string): Promise<any>{
+    //     let that = this
+    //     var htmlResult = parse5.parse(html);
+    //     return that.htmlBuildInfoParse(htmlResult,hid);
+
+
+
+    // var roomsInfoList:any[] = [];
+    // console.log(TempInfo);
+    // if (validBuildings.includes(TempInfo.rooms_fullname)) {
+    //     this.htmlRoomInfoParse(htmlResult,buildings,TempInfo,hid,roomsInfoList);
+    // }
+    //return groomsInfoList;
+    // };
+
     addDataset(id: string, content: string): Promise<InsightResponse> {
         let that = this;
-        return new Promise(function (fulfill, reject) {
+        // return new Promise(function (fulfill, reject) {
 
-            let insight: InsightResponse = {
-                code: null,
-                body: {}
-            };
 
-            if(id!=="courses"){
+        let insight: InsightResponse = {
+            code: null,
+            body: {}
+        };
+
+
+        if (id !== "courses" && id !== "rooms") {
+            return new Promise(function (fullfill, reject){
                 insight.code = 400;
-                insight.body = {"error": "not a course"};
+                insight.body = {"error": "not a course or room"};
                 return reject(insight);
-            }
+            })
 
-            if(fs.existsSync(id)){
-                insight.code = 201;
-                insight.body = {"success": "exist"};
+        }
 
-            }else{
-                insight.code = 204;
-                insight.body = {"success": "not exist"};
+        // if (fs.existsSync(id)) {
+        //     insight.code = 201;
+        //     insight.body = {"success": "exist"};
+        //
+        // } else {
+        //     insight.code = 204;
+        //     insight.body = {"success": "not exist"};
+        //
+        // }
 
-            }
 
-            // process the content (ie getting the info you want)
-            // store it into data structure
-            // save data structure to disk (using fs.writeFile)
+        if (id === "rooms") {
+            return new Promise(function (fulfill, reject) {
 
-            jsz.loadAsync(content, {'base64': true}).then(function(data:any){ // data is zipObject
+                if (fs.existsSync(id)) {
+                    insight.code = 201;
+                    insight.body = {"success": "exist"};
 
-                let listPromiseFiles:any[] = [];
+                } else {
+                    insight.code = 204;
+                    insight.body = {"success": "not exist"};
 
-                data.forEach(function(r:any,f:any){
+                }
 
-                    listPromiseFiles.push(f.async("string"));
+                if (fs.existsSync(id)) {fulfill(insight)}
+                jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
+                    let listPromiseFiles: any[] = [];
+
+                    data.forEach(function (r: any, f: any) {
+
+                        listPromiseFiles.push(f.async("string"));
                     });
 
-                let listFiles:any[]=[];
-                Promise.all(listPromiseFiles).then(function(filedata){
-                    for(let eachIndex in filedata){
-                        if (that.helper(filedata[eachIndex])) {
 
-                            try {
-                                var each = JSON.parse(filedata[eachIndex]);
-                            } catch (err) {
-                                each = filedata[eachIndex];
+                    let listFiles: any[] = [];
+                    Promise.all(listPromiseFiles).then(function (htmldata) {
+
+                        for (let i = 6; i < 82; i++) {
+                            listFiles.push(htmldata[i])
+                        }
+
+                        let indexJS = htmldata[82];
+
+                        if(that.htmlhelper(indexJS)){
+                            const document = parse5.parse(indexJS);
+                        }else{
+                            return new Promise(function (fullfill, reject){
+                                insight.code = 400;
+                                insight.body = {"error": "not a course or room"};
+                                return reject(insight);
+                            });
+                        }
+
+                        //const document = parse5.parse(indexJS);
+                        let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
+                            .childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes[1]
+                            .childNodes[3];
+
+                        let lobuildings: any = [];
+                        let buildings: any = {};
+                        for (let i = 1; i < tree.childNodes.length; i += 2) {
+                            let tr = tree.childNodes[i]
+                            let sname = tr.childNodes[3].childNodes[0].value.trim()
+                            // console.log(sname)
+                            let fname = tr.childNodes[5].childNodes[1].childNodes[0].value.trim()
+                            //  console.log(fname)
+                            let address = tr.childNodes[7].childNodes[0].value.trim()
+                            //  console.log(address)
+                            let link = tr.childNodes[9].childNodes[1].attrs[0].value.trim()
+                            //  console.log(link)
+                            let building = {
+                                rooms_fullname: fname, rooms_shortname: sname,
+                                rooms_address: address, link: link
                             }
+                            //   console.log(building)
+                            buildings[fname] = building;
+                        }
+                        gbulidings = buildings
+                        validBuildings = Object.keys(buildings)
+                        // console.log(validBuildings);
 
-                            if (typeof each === 'object') {
-                                for (let c of each['result']) {
 
-                                    if (c.length != 0) {
-                                        let newObj: any = {};
+                        let allBuildingsInfoList: any[] = [];
 
-                                        newObj[id + "_dept"] = c["Subject"];
-                                        newObj[id + "_id"] = c["Course"];
-                                        newObj[id + "_avg"] = c["Avg"];
-                                        newObj[id + "_instructor"] = c["Professor"];
-                                        newObj[id + "_title"] = c["Title"];
-                                        newObj[id + "_pass"] = c["Pass"];
-                                        newObj[id + "_fail"] = c["Fail"];
-                                        newObj[id + "_audit"] = c["Audit"];
-                                        newObj[id + "_uuid"] = c["id"];
+                        listFiles.forEach(function (eachI) {
+                            if (that.htmlhelper(eachI)) {
+                                try {
+                                    pArr.push(that.htmlBuildInfoParse(eachI,id));
+                                } catch (err) {
+                                    console.log(err);
+                                }
+                            }
+                        })
 
-                                        listFiles.push(newObj);
+                        let roomsInfoList:any[] = []
+                        Promise.all(pArr).then(function (data) {
+                            //console.log(data)
+                            for (let i in data) {
+                                let sub:any = data[i]
+                                if (sub.length>0) {
+                                    for (let j in sub){
+                                        roomsInfoList.push(sub[j])
+                                    }
+                                }
 
+                            }
+                            let xyz = JSON.stringify(roomsInfoList);
+                            if (fs.existsSync(id)) {fulfill(insight)}
+                            else {fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
+
+                                if (fileerr) {
+                                    insight.code = 400;
+                                    insight.body = {"error": "can't write the content to disk"};
+                                    return reject(insight);
+                                }
+
+                                fulfill(insight);
+                            });}
+                        }).catch(function (e) {
+                            insight.code = 400;
+                            insight.body = {"error": "can't write the content to disk"};
+                            reject(insight)
+                        })
+
+                    }).catch(function (perr: any) {
+                        insight.code = 400;
+                        insight.body = {"error": "can't write the content to disk"};
+                        reject(insight);
+                    });
+                })
+            })
+        }
+        // if (id === "rooms") {
+        //     return new Promise(function (fulfill, reject) {
+        //         jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
+        //             let listPromiseFiles: any[] = [];
+        //
+        //             data.forEach(function (r: any, f: any) {
+        //                 listPromiseFiles.push(f.async("string"));
+        //             });
+        //
+        //             let listFiles: any[] = [];
+        //             Promise.all(listPromiseFiles).then(function (htmldata) {
+        //                 for (let i = 6; i < 82; i++) {
+        //                     listFiles.push(htmldata[i])
+        //                 }
+        //                 //console.log(listFiles)
+        //                 let indexJS = htmldata[82];
+        //                 const document = parse5.parse(indexJS);
+        //                 let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
+        //                     .childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes[1]
+        //                     .childNodes[3];
+        //
+        //                 let lobuildings: any = [];
+        //                 let buildings: any = {};
+        //                 for (let i = 1; i < tree.childNodes.length; i += 2) {
+        //                     let tr = tree.childNodes[i]
+        //                     let sname = tr.childNodes[3].childNodes[0].value.trim()
+        //                     //console.log(sname)
+        //                     let fname = tr.childNodes[5].childNodes[1].childNodes[0].value.trim()
+        //                     //console.log(fname)
+        //                     let address = tr.childNodes[7].childNodes[0].value.trim()
+        //                     //console.log(address)
+        //                     let link = tr.childNodes[9].childNodes[1].attrs[0].value.trim()
+        //                     //console.log(link)
+        //                     let building = {
+        //                         rooms_fullname: fname, rooms_shortname: sname,
+        //                         rooms_address: address, link: link
+        //                     }
+        //                     //console.log(building)
+        //                     buildings[fname] = building;
+        //                 }
+        //                 console.log(buildings);
+        //
+        //             })
+        //         })
+        //         fulfill();
+        //     })
+        // }
+
+        if (id === "courses") {
+
+            return new Promise(function (fulfill, reject) {
+
+                if (fs.existsSync(id)) {
+                    insight.code = 201;
+                    insight.body = {"success": "exist"};
+
+                } else {
+                    insight.code = 204;
+                    insight.body = {"success": "not exist"};
+
+                }
+
+                if (fs.existsSync(id)) {fulfill(insight)}
+                jsz.loadAsync(content, {'base64': true}).then(function (data: any) { // data is zipObject
+
+                    let listPromiseFiles: any[] = [];
+
+                    data.forEach(function (r: any, f: any) {
+
+                        listPromiseFiles.push(f.async("string"));
+                    });
+
+                    let listFiles: any[] = [];
+                    Promise.all(listPromiseFiles).then(function (filedata) {
+                        for (let eachIndex in filedata) {
+                            if (that.helper(filedata[eachIndex])) {
+
+                                try {
+                                    var each = JSON.parse(filedata[eachIndex]);
+                                } catch (err) {
+                                    each = filedata[eachIndex];
+                                }
+
+                                if (typeof each === 'object') {
+                                    for (let c of each['result']) {
+
+                                        if (c.length != 0) {
+                                            let newObj: any = {};
+
+                                            newObj[id + "_dept"] = c["Subject"];
+                                            newObj[id + "_id"] = c["Course"];
+                                            newObj[id + "_avg"] = c["Avg"];
+                                            newObj[id + "_instructor"] = c["Professor"];
+                                            newObj[id + "_title"] = c["Title"];
+                                            newObj[id + "_pass"] = c["Pass"];
+                                            newObj[id + "_fail"] = c["Fail"];
+                                            newObj[id + "_audit"] = c["Audit"];
+                                            newObj[id + "_uuid"] = c["id"];
+                                            if(c["Section"]!=='overall') {
+                                                newObj[id + "_year"] = parseInt(c["Year"])
+                                            } else {
+                                                newObj[id + "_year"] = 1900
+                                            }
+
+                                            //check if the dataset is right
+                                            for(let i=0; i<Object.values(newObj).length; i++) {
+                                                if (Object.values(newObj)[i]===null) {
+                                                    return new Promise(function (fullfill, reject) {
+                                                        insight.code = 400;
+                                                        insight.body = {"error": "not matched data"};
+                                                        return reject(insight);
+                                                    });
+                                                }
+                                            }
+
+
+                                            listFiles.push(newObj);
+
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    let xyz = JSON.stringify(listFiles);
+                        let xyz = JSON.stringify(listFiles);
+
                         fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
                             if (fileerr) {
@@ -127,19 +636,232 @@ export default class InsightFacade implements IInsightFacade {
 
                             fulfill(insight);
                         });
-                }).catch(function(perr:any){
+
+                    }).catch(function (perr: any) {
+                        insight.code = 400;
+                        insight.body = {"error": "can't write the content to disk"};
+                        reject(insight);
+                    });
+
+                }).catch(function (e: any) {
                     insight.code = 400;
                     insight.body = {"error": "can't write the content to disk"};
                     reject(insight);
                 });
+            })
+        }
 
-            }).catch(function(e:any){
-                insight.code = 400;
-                insight.body = {"error": "can't write the content to disk"};
-                reject(insight);
-            });
-        });
     }
+    //
+    // findInfo(content: string, o: any): Object{
+    //     let that = this
+    //     if (typeof o !== 'object') return
+    //     if (Array.isArray(o)) return
+    //     let keys = Object.keys(o)
+    //     if (keys.indexOf('attrs') != -1) {
+    //         let attrs = o.attrs;
+    //         for (let each_attr of attrs) {
+    //             if (each_attr.name === 'class' && each_attr.value === 'views-table cols-5 table') {console.log('aaa')}
+    //
+    //         }
+    //     }
+    //
+    //     return 1;
+    // }
+
+    // addDataset(id: string, content: string): Promise<InsightResponse> {
+    //
+    //     let that = this;
+    //     let insight: InsightResponse = {
+    //         code: null,
+    //         body: {}
+    //     };
+    //
+    //     // id = courses
+    //     if (id === "courses") {
+    //         return new Promise(function (fulfill, reject) {
+    //         // if(id!=="courses"){
+    //         //     insight.code = 400;
+    //         //     insight.body = {"error": "not a course"};
+    //         //     return reject(insight);
+    //         // }
+    //
+    //         if(fs.existsSync(id)){
+    //             insight.code = 201;
+    //             insight.body = {"success": "exist"};
+    //
+    //         }else{
+    //             insight.code = 204;
+    //             insight.body = {"success": "not exist"};
+    //
+    //         }
+    //
+    //         jsz.loadAsync(content, {'base64': true}).then(function(data:any){ // data is zipObject
+    //
+    //             let listPromiseFiles:any[] = [];
+    //
+    //             data.forEach(function(r:any,f:any){
+    //
+    //                 listPromiseFiles.push(f.async("string"));
+    //             });
+    //
+    //             let listFiles:any[]=[];
+    //             Promise.all(listPromiseFiles).then(function(filedata){
+    //                 for(let eachIndex in filedata){
+    //                     if (that.helper(filedata[eachIndex])) {
+    //
+    //                         try {
+    //                             var each = JSON.parse(filedata[eachIndex]);
+    //                         } catch (err) {
+    //                             each = filedata[eachIndex];
+    //                         }
+    //
+    //                         if (typeof each === 'object') {
+    //                             for (let c of each['result']) {
+    //
+    //                                 if (c.length != 0) {
+    //                                     let newObj: any = {};
+    //
+    //                                     newObj[id + "_dept"] = c["Subject"];
+    //                                     newObj[id + "_id"] = c["Course"];
+    //                                     newObj[id + "_avg"] = c["Avg"];
+    //                                     newObj[id + "_instructor"] = c["Professor"];
+    //                                     newObj[id + "_title"] = c["Title"];
+    //                                     newObj[id + "_pass"] = c["Pass"];
+    //                                     newObj[id + "_fail"] = c["Fail"];
+    //                                     newObj[id + "_audit"] = c["Audit"];
+    //                                     newObj[id + "_uuid"] = c["id"];
+    //
+    //                                     listFiles.push(newObj);
+    //
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //
+    //                 let xyz = JSON.stringify(listFiles);
+    //                 fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
+    //
+    //                     if (fileerr) {
+    //                         insight.code = 400;
+    //                         insight.body = {"error": "can't write the content to disk"};
+    //                         return reject(insight);
+    //                     }
+    //
+    //                     fulfill(insight);
+    //                 });
+    //             }).catch(function(perr:any){
+    //                 insight.code = 400;
+    //                 insight.body = {"error": "can't write the content to disk"};
+    //                 reject(insight);
+    //             });
+    //
+    //         }).catch(function(e:any){
+    //             insight.code = 400;
+    //             insight.body = {"error": "can't write the content to disk"};
+    //             reject(insight);
+    //         });
+    //     });
+    //    }
+    //
+    //    else if (id === "rooms") {
+    //         return new Promise(function (fulfill, reject) {
+    //
+    //             jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
+    //                 //console.log(data)
+    //                 let listPromiseFiles: any[] = [];
+    //                 data.forEach(function (r: any, f: any) {
+    //                     listPromiseFiles.push(f.async("string"));
+    //                 });
+    //
+    //                 console.log(listPromiseFiles.length)
+    //
+    //                 Promise.all(listPromiseFiles).then(function (filedata) {
+    //                     let indexJS = filedata[82]
+    //                     const document = parse5.parse(indexJS)
+    //                     let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
+    //                         .childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes[1]
+    //                         .childNodes[3]
+    //                     //that.findInfo('a', document.childNodes[6].childNodes[3].childNodes[1].parentNode)
+    //                     console.log(tree);
+    //                     let lobuildings: any = []
+    //                     let buildings: any = {}
+    //                     for (let i = 1; i < tree.childNodes.length; i += 2) {
+    //                         let tr = tree.childNodes[i]
+    //                         let sname = tr.childNodes[3].childNodes[0].value.trim()
+    //                         console.log(sname)
+    //                         let fname = tr.childNodes[5].childNodes[1].childNodes[0].value.trim()
+    //                         console.log(fname)
+    //                         let address = tr.childNodes[7].childNodes[0].value.trim()
+    //                         console.log(address)
+    //                         let link = tr.childNodes[9].childNodes[1].attrs[0].value.trim()
+    //                         console.log(link)
+    //                         let building = {
+    //                             rooms_fullname: fname, rooms_shortname: sname,
+    //                             rooms_address: address, link: link
+    //                         }
+    //                         console.log(building)
+    //                         buildings[fname] = building;
+    //                     }
+    //                     console.log(buildings)
+    //
+    //
+    //                     Object.keys(buildings).forEach((key: any) => {
+    //                         let file = buildings[key].link
+    //                         console.log(file)
+    //
+    //                     })
+    //
+    //
+    //                     fulfill('fulfill')
+    //                 }).catch(function (err: any) {
+    //                     console.log('fail')
+    //                     reject()
+    //                 })
+    //
+    //             }).catch(function (err: any) {
+    //                 console.log(err)
+    //                 reject()
+    //             });
+    //
+    //         });
+    //     }
+    //     else if ((id!=="rooms") && (id!=="courses")) {
+    //         return new Promise(function (fulfill, reject) {
+    //             insight.code = 400;
+    //             insight.body = {"error": "not a course nor a room"};
+    //             return reject(insight);
+    //         });
+    //     }
+    //
+    //
+    // }
+
+
+// Temporary removed from AddData
+// ------------------------------------------
+// let insight: InsightResponse = {
+//     code: null,
+//     body: {}
+// };
+//
+// if(id!=="courses"){
+//     insight.code = 400;
+//     insight.body = {"error": "not a course"};
+//     return reject(insight);
+// }
+//
+// if(fs.existsSync(id)){
+//     insight.code = 201;
+//     insight.body = {"success": "exist"};
+//
+// }else{
+//     insight.code = 204;
+//     insight.body = {"success": "not exist"};
+//
+// }
+// --------------------------------------------
 
     removeDataset(id: string): Promise<InsightResponse> {
 
@@ -150,7 +872,7 @@ export default class InsightFacade implements IInsightFacade {
 
         return new Promise(function (fulfill, reject) {
 
-            if(id!=="courses"){
+            if(!(id==="courses"||id==="rooms")){
                 retInsight.code = 404;
                 return reject(retInsight);
             }
@@ -170,112 +892,144 @@ export default class InsightFacade implements IInsightFacade {
 
         return new Promise(function (fulfill, reject) {
             try {
-                that.checkValidity(query)
+                if (!that.checkValidity2(query) && !that.checkValidity1(query))  {
+                    reject({code: 400, body: {"error": "invalid query"}});
+                }
             } catch(exception) {
                 reject({code: 400, body: {"error": "invalid query"}});
             }
 
+            // Query OK, decide which dataset to perform query on
+
             // try {
-                let dataset: any = {};
-                let id = "courses"
-                let result: any[] = []
-                try {
+            //let dataset: any = {};
+            let id = that.getID(query)
+
+            let result: any[] = []
+            try {
+                if (!Object.keys(dataset).includes(id)) {
                     dataset[id] = JSON.parse(fs.readFileSync(id))
-                } catch (err) {
-                    reject({code: 424, body: {"error": "missing dataset"}})
                 }
 
+            } catch (err) {
+                reject({code: 424, body: {"error": "missing dataset"}})
+            }
 
-                let where = query["WHERE"]
-                let options = query["OPTIONS"]
-                for (let data of dataset[id]) {
-                    if (that.parser(where, data)) {
-                        result.push(data)
-                    }
+
+            let where = query["WHERE"]
+            let options = query["OPTIONS"]
+            for (let data of dataset[id]) {
+                if (that.parser(where, data)) {
+                    result.push(data)
                 }
-                let filtereds: any[] = []
-                let keysForOpt = Object.keys(options)
-                const allowed = options["COLUMNS"]
+            }
+            let filtereds: any[] = []
+            let keysForOpt = Object.keys(options)
+            const allowed = options["COLUMNS"]
 
-                for (let raw of result) {
-                    const filtered = Object.keys(raw)
-                        .filter(key => allowed.includes(key))
-                        .reduce((obj, key) => {
-                            (<any>obj)[key] = (<any>raw)[key];
-                            return obj;
-                        }, {});
-                    filtereds.push(filtered)
+            for (let raw of result) {
+                let temp: any = {}
+                for (let field of allowed) {
+                    temp[field] = raw[field]
                 }
+                filtereds.push(temp)
+            }
 
-                if (keysForOpt.includes("ORDER")) {
-                    let sortOn = options["ORDER"] // string
-                    filtereds.sort(function (a, b) {
-                        return a[sortOn] - b[sortOn]
-                    });
-                }
+            //const allowed = options["COLUMNS"]
+            // for (let raw of result) {
+            //     const filtered = Object.keys(raw)
+            //         .filter(key => allowed.includes(key))
+            //         .reduce((obj, key) => {
+            //             (<any>obj)[key] = (<any>raw)[key];
+            //             return obj;
+            //         }, {});
+            //     filtereds.push(filtered)
+            // }
+            let sortOn =''
+            if (keysForOpt.includes("ORDER")) {
+                let sortOn = options["ORDER"] // string
 
-                fulfill({code: 200, body: {result: filtereds}})
+                filtereds.sort(function (a, b) {
+                    if (a[sortOn] < b[sortOn])
+                        return -1
+                    if ( a[sortOn] > b[sortOn])
+                        return 1
+                    return 0
+
+                });
+
+            }
+
+            fulfill({code: 200, body: {result: filtereds}})
             // } catch (err){
             //     console.log("shouldn't have been here")
             // }
 
         })
+
     }
 
-    checkValidity(query: any): boolean {
-        let that = this;
+    getID(query: any): string {
+        let that = this
+        if (that.isKey1(query["OPTIONS"]["COLUMNS"][0])) return "courses"
+        if (that.isKey2(query["OPTIONS"]["COLUMNS"][0])) return "rooms"
+        return ""
+    }
 
-        if (query===null || query === {}) throw false;
+    checkValidity1(query: any): boolean {
+        let that = this;
+        if (query === null || query === {}) return false;
         let keys = Object.keys(query)
-        if (keys.length !== 2 ||(!keys.includes("WHERE"))||(!keys.includes("OPTIONS"))) throw false;
+        if (keys.length !== 2 || (!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
 
 
         let obj1 = query["WHERE"]
         let obj2 = query[keys[1]]
         let conds = Object.keys(obj2)
-        if (!conds.includes("COLUMNS")) throw false
-        if ((!conds.includes("ORDER")) && conds.length !== 1) throw false
-        if ((conds.includes("ORDER")) && conds.length !== 2) throw false
+        if (!conds.includes("COLUMNS")) return false
+        if ((!conds.includes("ORDER")) && conds.length !== 1) return false
+        if ((conds.includes("ORDER")) && conds.length !== 2) return false
         let colItems = obj2["COLUMNS"]
 
-        if ((!Array.isArray(colItems)) || colItems.length === 0) throw false
+        if ((!Array.isArray(colItems)) || colItems.length === 0) return false
         for (let i of colItems) {
-            if (!that.isKey(i)) {
-                throw false
+            if (!that.isKey1(i)) {
+                return false
             }
         }
         if (conds.includes("ORDER")) {
             let order = obj2["ORDER"]
-            if (!that.isKey(order)) throw false
-            if (!colItems.includes(order)) throw false
+            if (!that.isKey1(order)) return false
+            if (!colItems.includes(order)) return false
         }
 
         // now OPTIONS is all good
-        if (!that.isValidFilter(obj1)) throw false;
+        if (!that.isValidFilter1(obj1)) return false;
 
         return true
     }
 
-    isKey(item: any): boolean {
+
+    isKey1(item: any): boolean {
         let that = this;
-        return that.ismKey(item) || that.issKey(item)
+        return that.ismKey1(item) || that.issKey1(item)
     }
 
-    ismKey(k: any): boolean {
+    ismKey1(k: any): boolean {
         if (typeof k !== 'string') return false
-        return (k === 'courses_avg')||(k === 'courses_pass')||(k === 'courses_fail')||(k === 'courses_audit')
+        return (k === 'courses_avg')||(k === 'courses_pass')||(k === 'courses_fail')||(k === 'courses_audit')||(k === 'courses_year')
     }
 
-    issKey(k: any): boolean {
+    issKey1(k: any): boolean {
         if (typeof k !== 'string') return false
         return (k === 'courses_dept')||(k === 'courses_id')||(k === 'courses_instructor')||(k === 'courses_title')||(k=== 'courses_uuid')
     }
 
-    isValidFilter(obj:any):boolean {
+    isValidFilter1(obj:any):boolean {
         let that = this
-            if (!(obj instanceof Object)) {
-                return false;
-            }
+        if (!(obj instanceof Object)) {
+            return false;
+        }
         if (Object.keys(obj).length != 1) return false
         let key = Object.keys(obj)[0]
 
@@ -283,28 +1037,29 @@ export default class InsightFacade implements IInsightFacade {
             let objInside = obj[key]
             if ((!Array.isArray(objInside)) || objInside.length <2) return false
             for (let i of objInside) {
-                if (!this.isValidFilter(i)) return false
+                if (!this.isValidFilter1(i)) return false
             }
             return true
         }
         if (key === "GT" || key === "LT" || key === "EQ") {
             let objInside = obj[key]
-                if (!(objInside instanceof Object))
-                    return false
+            if (!(objInside instanceof Object))
+                return false
             let keys = Object.keys(objInside)
             if (keys.length !== 1) return false
-            return that.ismKey(keys[0]) && (typeof objInside[keys[0]] == 'number')
+            return that.ismKey1(keys[0]) && (typeof objInside[keys[0]] == 'number')
         }
         if (key === "NOT") {
-            return this.isValidFilter(obj[key])
+            return this.isValidFilter1(obj[key])
         }
         if (key === "IS") {
             let objInside = obj[key]
             if (!(objInside instanceof Object)) return false
             let keys = Object.keys(objInside)
             if (keys.length!==1) return false
-            return that.issKey(keys[0]) && (typeof objInside[keys[0]] == 'string')
+            return that.issKey1(keys[0]) && (typeof objInside[keys[0]] == 'string')
         }
+
     }
 
     parser(filter: any, data: any) : boolean {
@@ -332,18 +1087,18 @@ export default class InsightFacade implements IInsightFacade {
             if (val.length === 1 && val[0] === "*") return false
             if (val.length === 2 && val[0] === "*" && val[1] === "*") return true
 
-                if (val[0] === "*" && val[val.length - 1] === "*") {
-                    let subString = val.substring(1,val.length-1)
-                    return data[field].indexOf(subString) >= 0
-                }
-                if (val[0] === "*" && val[val.length - 1] !== "*") {
-                    let subString = val.substring(1,val.length)
-                    if (data[field].length < subString.length) return false
-                    return data[field].indexOf(subString) === data[field].length - subString.length
-                }
-                if (val[0] !== "*" && val[val.length - 1] === "*") {
-                    let subString = val.substring(0,val.length-1)
-                    return data[field].indexOf(subString) === 0
+            if (val[0] === "*" && val[val.length - 1] === "*") {
+                let subString = val.substring(1,val.length-1)
+                return data[field].indexOf(subString) >= 0
+            }
+            if (val[0] === "*" && val[val.length - 1] !== "*") {
+                let subString = val.substring(1,val.length)
+                if (data[field].length < subString.length) return false
+                return data[field].indexOf(subString) === data[field].length - subString.length
+            }
+            if (val[0] !== "*" && val[val.length - 1] === "*") {
+                let subString = val.substring(0,val.length-1)
+                return data[field].indexOf(subString) === 0
             }
             return data[field]  === val
         }
@@ -367,4 +1122,92 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
     }
+
+    checkValidity2(query: any): boolean {
+        let that = this;
+
+        if (query === null || query === {}) return false;
+        let keys = Object.keys(query)
+        if (keys.length !== 2 || (!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+
+
+        let obj1 = query["WHERE"]
+        let obj2 = query[keys[1]]
+        let conds = Object.keys(obj2)
+        if (!conds.includes("COLUMNS")) return false
+        if ((!conds.includes("ORDER")) && conds.length !== 1) return false
+        if ((conds.includes("ORDER")) && conds.length !== 2) return false
+        let colItems = obj2["COLUMNS"]
+
+        if ((!Array.isArray(colItems)) || colItems.length === 0) return false
+        for (let i of colItems) {
+            if (!that.isKey2(i)) {
+                return false
+            }
+        }
+        if (conds.includes("ORDER")) {
+            let order = obj2["ORDER"]
+            if (!that.isKey2(order)) return false
+            if (!colItems.includes(order)) return false
+        }
+
+        // now OPTIONS is all good
+        if (!that.isValidFilter2(obj1)) return false;
+
+        return true
+    }
+
+    isKey2(item: any): boolean {
+        let that = this;
+        return that.ismKey2(item) || that.issKey2(item)
+    }
+
+    ismKey2(k: any): boolean {
+        if (typeof k !== 'string') return false
+        return (k === 'rooms_lat')||(k === 'rooms_lon')||(k === 'rooms_seats')
+    }
+
+    issKey2(k: any): boolean {
+        if (typeof k !== 'string') return false
+        return (k === 'rooms_fullname')||(k === 'rooms_shortname')||(k === 'rooms_number')||(k === 'rooms_name')||(k=== 'rooms_address')
+            ||(k=== 'rooms_type')||(k === 'rooms_furniture')||(k=== 'rooms_href')
+    }
+
+    isValidFilter2(obj:any):boolean {
+        let that = this
+        if (!(obj instanceof Object)) {
+            return false;
+        }
+        if (Object.keys(obj).length != 1) return false
+        let key = Object.keys(obj)[0]
+
+        if (key === "AND" || key === "OR") {
+            let objInside = obj[key]
+            if ((!Array.isArray(objInside)) || objInside.length <2) return false
+            for (let i of objInside) {
+                if (!this.isValidFilter2(i)) return false
+            }
+            return true
+        }
+        if (key === "NOT") {
+            return this.isValidFilter2(obj[key])
+        }
+
+        if (key === "GT" || key === "LT" || key === "EQ") {
+            let objInside = obj[key]
+            if (!(objInside instanceof Object))
+                return false
+            let keys = Object.keys(objInside)
+            if (keys.length !== 1) return false
+            return that.ismKey2(keys[0]) && (typeof objInside[keys[0]] == 'number')
+        }
+        if (key === "IS") {
+            let objInside = obj[key]
+            if (!(objInside instanceof Object)) return false
+            let keys = Object.keys(objInside)
+            if (keys.length!==1) return false
+            return that.issKey2(keys[0]) && (typeof objInside[keys[0]] == 'string')
+        }
+    }
 }
+
