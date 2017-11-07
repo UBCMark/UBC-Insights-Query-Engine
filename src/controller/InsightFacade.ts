@@ -1049,7 +1049,7 @@ export default class InsightFacade implements IInsightFacade {
 
         if (key === "AND" || key === "OR") {
             let objInside = obj[key]
-            if ((!Array.isArray(objInside)) || objInside.length <2) return false
+            if ((!Array.isArray(objInside)) || objInside.length ===0) return false
             for (let i of objInside) {
                 if (!this.isValidFilter1(i)) return false
             }
@@ -1197,7 +1197,7 @@ export default class InsightFacade implements IInsightFacade {
 
         if (key === "AND" || key === "OR") {
             let objInside = obj[key]
-            if ((!Array.isArray(objInside)) || objInside.length <2) return false
+            if ((!Array.isArray(objInside)) || objInside.length ===0) return false
             for (let i of objInside) {
                 if (!this.isValidFilter2(i)) return false
             }
