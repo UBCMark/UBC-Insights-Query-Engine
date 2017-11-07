@@ -40,7 +40,7 @@ let count = 0;
 let validBuildings:any = []
 let groomsInfoList:any[] = [];
 var gbulidings:any = {}
-var pArr:any = []
+//var pArr:any = []
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -368,31 +368,18 @@ export default class InsightFacade implements IInsightFacade {
 
         }
 
-        // if (fs.existsSync(id)) {
-        //     insight.code = 201;
-        //     insight.body = {"success": "exist"};
-        //
-        // } else {
-        //     insight.code = 204;
-        //     insight.body = {"success": "not exist"};
-        //
+        // if(content===null){
+        //     return new Promise(function (fullfill, reject){
+        //         insight.code = 400;
+        //         insight.body = {"error": "not a course or room"};
+        //         return reject(insight);
+        //     })
         // }
-
-
+        
         if (id === "rooms") {
             return new Promise(function (fulfill, reject) {
 
-                if (fs.existsSync(id)) {
-                    insight.code = 201;
-                    insight.body = {"success": "exist"};
-
-                } else {
-                    insight.code = 204;
-                    insight.body = {"success": "not exist"};
-
-                }
-
-                if (fs.existsSync(id)) {fulfill(insight)}
+                //if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
                     let listPromiseFiles: any[] = [];
 
@@ -411,15 +398,16 @@ export default class InsightFacade implements IInsightFacade {
 
                         let indexJS = htmldata[82];
 
-                        if(that.htmlhelper(indexJS)){
+                        //if(that.htmlhelper(indexJS)){
                             const document = parse5.parse(indexJS);
-                        }else{
-                            return new Promise(function (fullfill, reject){
-                                insight.code = 400;
-                                insight.body = {"error": "not a course or room"};
-                                return reject(insight);
-                            });
-                        }
+                        //}else{
+                        //    return new Promise(function (fullfill, reject){
+                        //        insight.code = 400;
+                        //        insight.body = {"error": "not a course or room"};
+                        //        reject(insight);
+                        //        return;
+                        //    });
+                        //}
 
                         //const document = parse5.parse(indexJS);
                         let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
@@ -429,7 +417,7 @@ export default class InsightFacade implements IInsightFacade {
                         let lobuildings: any = [];
                         let buildings: any = {};
                         for (let i = 1; i < tree.childNodes.length; i += 2) {
-                            let tr = tree.childNodes[i]
+                            let tr = tree.childNodes[i] as any;
                             let sname = tr.childNodes[3].childNodes[0].value.trim()
                             // console.log(sname)
                             let fname = tr.childNodes[5].childNodes[1].childNodes[0].value.trim()
@@ -445,17 +433,17 @@ export default class InsightFacade implements IInsightFacade {
                             //   console.log(building)
                             buildings[fname] = building;
                         }
-                        gbulidings = buildings
-                        validBuildings = Object.keys(buildings)
+                        gbulidings = buildings;
+                        validBuildings = Object.keys(buildings);
                         // console.log(validBuildings);
 
 
                         let allBuildingsInfoList: any[] = [];
-
+                        var pArr:any[] = [];
                         listFiles.forEach(function (eachI) {
                             if (that.htmlhelper(eachI)) {
                                 try {
-                                    pArr.push(that.htmlBuildInfoParse(eachI,id));
+                                    pArr.push(that.htmlBuildInfoParse(eachI,id));   ////????
                                 } catch (err) {
                                     console.log(err);
                                 }
@@ -474,28 +462,51 @@ export default class InsightFacade implements IInsightFacade {
                                 }
 
                             }
+
+                            //add new check**************
+                            if(roomsInfoList.length===0){
+                                insight.code = 400;
+                                insight.body = {"error": "no right content"};
+                                reject(insight);
+                                return;
+                            }
+                            if (fs.existsSync(id)) {
+                                insight.code = 201;
+                                insight.body = {"success": "exist"};
+
+                            } else {
+                                insight.code = 204;
+                                insight.body = {"success": "not exist"};
+
+                            }
                             let xyz = JSON.stringify(roomsInfoList);
-                            if (fs.existsSync(id)) {fulfill(insight)}
-                            else {fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
+                            //if (fs.existsSync(id)) {fulfill(insight)}
+                           // else {
+                                fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
                                 if (fileerr) {
                                     insight.code = 400;
                                     insight.body = {"error": "can't write the content to disk"};
-                                    return reject(insight);
+                                    reject(insight);
+                                    return;
                                 }
 
                                 fulfill(insight);
-                            });}
+                                return;
+                            });
+                        //}
                         }).catch(function (e) {
                             insight.code = 400;
                             insight.body = {"error": "can't write the content to disk"};
-                            reject(insight)
+                            reject(insight);
+                            return;
                         })
 
                     }).catch(function (perr: any) {
                         insight.code = 400;
                         insight.body = {"error": "can't write the content to disk"};
                         reject(insight);
+                        return;
                     });
                 })
             })
@@ -552,17 +563,8 @@ export default class InsightFacade implements IInsightFacade {
 
             return new Promise(function (fulfill, reject) {
 
-                if (fs.existsSync(id)) {
-                    insight.code = 201;
-                    insight.body = {"success": "exist"};
 
-                } else {
-                    insight.code = 204;
-                    insight.body = {"success": "not exist"};
-
-                }
-
-                if (fs.existsSync(id)) {fulfill(insight)}
+                //if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) { // data is zipObject
 
                     let listPromiseFiles: any[] = [];
@@ -581,6 +583,7 @@ export default class InsightFacade implements IInsightFacade {
                                     var each = JSON.parse(filedata[eachIndex]);
                                 } catch (err) {
                                     each = filedata[eachIndex];
+
                                 }
 
                                 if (typeof each === 'object') {
@@ -604,24 +607,30 @@ export default class InsightFacade implements IInsightFacade {
                                                 newObj[id + "_year"] = 1900
                                             }
 
-                                            //check if the dataset is right
-                                            for(let i=0; i<Object.values(newObj).length; i++) {
-                                                if (Object.values(newObj)[i]===null) {
-                                                    return new Promise(function (fullfill, reject) {
-                                                        insight.code = 400;
-                                                        insight.body = {"error": "not matched data"};
-                                                        return reject(insight);
-                                                    });
-                                                }
-                                            }
-
-
                                             listFiles.push(newObj);
 
                                         }
                                     }
                                 }
                             }
+                        }
+
+                        //add new check***************************
+                        if(listFiles.length===0){
+                            insight.code = 400;
+                            insight.body = {"error": "not right content"};
+                            reject(insight);
+                            return;
+                        }
+
+                        if (fs.existsSync(id)) {
+                            insight.code = 201;
+                            insight.body = {"success": "exist"};
+
+                        } else {
+                            insight.code = 204;
+                            insight.body = {"success": "not exist"};
+
                         }
 
                         let xyz = JSON.stringify(listFiles);
@@ -631,23 +640,27 @@ export default class InsightFacade implements IInsightFacade {
                             if (fileerr) {
                                 insight.code = 400;
                                 insight.body = {"error": "can't write the content to disk"};
-                                return reject(insight);
+                                reject(insight);
                             }
 
                             fulfill(insight);
+                            return;
                         });
 
                     }).catch(function (perr: any) {
                         insight.code = 400;
                         insight.body = {"error": "can't write the content to disk"};
                         reject(insight);
+                        return;
                     });
 
                 }).catch(function (e: any) {
                     insight.code = 400;
                     insight.body = {"error": "can't write the content to disk"};
                     reject(insight);
+                    return;
                 });
+
             })
         }
 
@@ -879,6 +892,7 @@ export default class InsightFacade implements IInsightFacade {
             if(fs.existsSync(id)) {
                 fs.unlinkSync(id);
                 retInsight.code = 204;
+                delete dataset[id];
                 fulfill(retInsight);
             }else{
                 retInsight.code = 404;

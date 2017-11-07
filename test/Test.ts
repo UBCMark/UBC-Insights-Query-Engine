@@ -1447,6 +1447,49 @@ describe("Test", function() {
         });
     });
 
+    //*****************
+    //perform query after remove
+    it("RtestComplexOr AfterRemove", function() {
+        return IF.performQuery({
+                "WHERE":{
+                    "OR": [{"EQ":{"rooms_seats":100}},{"IS":{"rooms_name":"ANGU_037"}}]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "rooms_name",
+                        "rooms_number","rooms_address"
+                    ],
+                    "ORDER":"rooms_number"
+                }
+            }
+        ).then(function (result: any) {
+           expect.fail();
+        }).catch(function (err) {
+            expect(err.code).eq(424);
+        })
+    });
+
+    //*****************
+    //perform query after remove
+    it("RtestComplexOr1111111 AfterRemove", function() {
+        return IF.performQuery({
+                "WHERE":{
+                    "OR": [{"EQ":{"rooms_seats":100}},{"IS":{"rooms_name":"ANGU_037"}}]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "rooms_name",
+                        "rooms_number","rooms_address"
+                    ],
+                    "ORDER":"rooms_number"
+                }
+            }
+        ).then(function (result: any) {
+            expect.fail();
+        }).catch(function (err) {
+            expect(err.code).eq(424);
+        })
+    });
 
 
 })
