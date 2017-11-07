@@ -40,7 +40,7 @@ let count = 0;
 let validBuildings:any = []
 let groomsInfoList:any[] = [];
 var gbulidings:any = {}
-var pArr:any = []
+//var pArr:any = []
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -433,17 +433,17 @@ export default class InsightFacade implements IInsightFacade {
                             //   console.log(building)
                             buildings[fname] = building;
                         }
-                        gbulidings = buildings
-                        validBuildings = Object.keys(buildings)
+                        gbulidings = buildings;
+                        validBuildings = Object.keys(buildings);
                         // console.log(validBuildings);
 
 
                         let allBuildingsInfoList: any[] = [];
-
+                        var pArr:any[] = [];
                         listFiles.forEach(function (eachI) {
                             if (that.htmlhelper(eachI)) {
                                 try {
-                                    pArr.push(that.htmlBuildInfoParse(eachI,id));
+                                    pArr.push(that.htmlBuildInfoParse(eachI,id));   ////????
                                 } catch (err) {
                                     console.log(err);
                                 }
