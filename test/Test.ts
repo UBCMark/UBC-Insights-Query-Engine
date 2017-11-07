@@ -1384,8 +1384,8 @@ describe("Test", function() {
         })
     });
 
-    //
-    // // remove
+
+    // remove
     it("test removeDataset", function () {
 
         IF.removeDataset("courses").then(function (data) {

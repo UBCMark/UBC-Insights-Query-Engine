@@ -383,7 +383,7 @@ export default class InsightFacade implements IInsightFacade {
 
                 }
 
-                if (fs.existsSync(id)) {fulfill(insight)}
+              //  if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
                     let listPromiseFiles: any[] = [];
 
@@ -852,7 +852,7 @@ export default class InsightFacade implements IInsightFacade {
             if(fs.existsSync(id)) {
                 fs.unlinkSync(id);
                 retInsight.code = 204;
-                dataset[id] = []
+                delete dataset[id]
                 fulfill(retInsight);
             }else{
                 retInsight.code = 404;
