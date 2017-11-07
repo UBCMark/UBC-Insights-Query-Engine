@@ -1471,7 +1471,7 @@ describe("Test", function() {
 
     //*****************
     //perform query after remove
-    it("RtestComplexOr1 AfterRemove", function() {
+    it("RtestComplexOr1111111 AfterRemove", function() {
         return IF.performQuery({
                 "WHERE":{
                     "OR": [{"EQ":{"rooms_seats":100}},{"IS":{"rooms_name":"ANGU_037"}}]

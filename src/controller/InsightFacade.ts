@@ -368,19 +368,18 @@ export default class InsightFacade implements IInsightFacade {
 
         }
 
-        if(content===null){
-            return new Promise(function (fullfill, reject){
-                insight.code = 400;
-                insight.body = {"error": "not a course or room"};
-                return reject(insight);
-            })
-        }
+        // if(content===null){
+        //     return new Promise(function (fullfill, reject){
+        //         insight.code = 400;
+        //         insight.body = {"error": "not a course or room"};
+        //         return reject(insight);
+        //     })
+        // }
         
         if (id === "rooms") {
             return new Promise(function (fulfill, reject) {
 
-
-                if (fs.existsSync(id)) {fulfill(insight)}
+                //if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
                     let listPromiseFiles: any[] = [];
 
@@ -399,16 +398,16 @@ export default class InsightFacade implements IInsightFacade {
 
                         let indexJS = htmldata[82];
 
-                        if(that.htmlhelper(indexJS)){
+                        //if(that.htmlhelper(indexJS)){
                             const document = parse5.parse(indexJS);
-                        }else{
-                            return new Promise(function (fullfill, reject){
-                                insight.code = 400;
-                                insight.body = {"error": "not a course or room"};
-                                reject(insight);
-                                return;
-                            });
-                        }
+                        //}else{
+                        //    return new Promise(function (fullfill, reject){
+                        //        insight.code = 400;
+                        //        insight.body = {"error": "not a course or room"};
+                        //        reject(insight);
+                        //        return;
+                        //    });
+                        //}
 
                         //const document = parse5.parse(indexJS);
                         let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
@@ -481,8 +480,9 @@ export default class InsightFacade implements IInsightFacade {
 
                             }
                             let xyz = JSON.stringify(roomsInfoList);
-                            if (fs.existsSync(id)) {fulfill(insight)}
-                            else {fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
+                            //if (fs.existsSync(id)) {fulfill(insight)}
+                           // else {
+                                fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
                                 if (fileerr) {
                                     insight.code = 400;
@@ -493,7 +493,8 @@ export default class InsightFacade implements IInsightFacade {
 
                                 fulfill(insight);
                                 return;
-                            });}
+                            });
+                        //}
                         }).catch(function (e) {
                             insight.code = 400;
                             insight.body = {"error": "can't write the content to disk"};
@@ -606,23 +607,9 @@ export default class InsightFacade implements IInsightFacade {
                                                 newObj[id + "_year"] = 1900
                                             }
 
-                                            //check if the dataset is right
-                                            // for(let i=0; i<Object.values(newObj).length; i++) {
-                                            //     if (Object.values(newObj)[i]===null) {
-                                            //         return new Promise(function (fullfill, reject) {
-                                            //             insight.code = 400;
-                                            //             insight.body = {"error": "not matched data"};
-                                            //             return reject(insight);
-                                            //         });
-                                            //     }
-                                            // }
-
-
                                             listFiles.push(newObj);
 
-                                        }//else{
-                                          //  ...
-                                        //}
+                                        }
                                     }
                                 }
                             }
@@ -905,6 +892,7 @@ export default class InsightFacade implements IInsightFacade {
             if(fs.existsSync(id)) {
                 fs.unlinkSync(id);
                 retInsight.code = 204;
+                delete dataset[id];
                 fulfill(retInsight);
             }else{
                 retInsight.code = 404;
