@@ -159,194 +159,9 @@ export default class InsightFacade implements IInsightFacade {
             });
 
         })
-        // if(!isUndefined(htmlResult) && htmlResult!==null && Object.keys(htmlResult).includes("nodeName")) {
-        //     if (htmlResult.nodeName === "div" && !isUndefined(htmlResult.attrs[0])&& htmlResult.attrs[0].value.includes("building-info")) {
-        //         count++
-//                 let newObj: any = {};
-//                 let flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1];
-//                 if (!isUndefined(flag)) {
-//                     newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
-//                     newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
-//
-// //get the address in the rightformat
-//                     var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
-//                 }else {
-//                     newObj[hid + "_fullname"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
-//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[1].childNodes[0].childNodes[0].value.trim();
-//                     newObj[hid + "_address"] = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
-//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
-//
-// //get the address in the rightformat
-//                     var vaddress: string = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[12].childNodes[1].childNodes[3]  //section
-//                         .childNodes[1].childNodes[3].childNodes[1].childNodes[1].childNodes[1].childNodes[3].childNodes[0].childNodes[0].value.trim();
-//                 }
-//
-//                 var addAddress:string = querystring.escape(vaddress);
-//
-//                 //pass the result into URL
-//                     // let that = this;
-//                 http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + addAddress, (res) => {
-//
-//                     res.setEncoding('utf8');
-//                     let rawData = '';
-//                     res.on('data', (chunk) => { rawData += chunk; });
-//                     res.on('end', () => {
-//                         try {
-//                             let parsedData = JSON.parse(rawData);
-//                             newObj[hid + "_lat"] = parsedData["lat"];
-//                             newObj[hid + "_lon"] = parsedData["lon"];
-//                             TempInfo = newObj;
-//                             if (validBuildings.includes(TempInfo.rooms_fullname)) {
-//                                 that.htmlRoomInfoParse(htmlResult, gbulidings, newObj, hid);
-//                             }
-//                         } catch (e) {
-//                             console.error(e.message);
-//                         }
-//                     });
-//                 });
-
-        /*
-        http.get('http://skaha.cs.ubc.ca:11316/api/v1/team70/' + address, res => {
-            //  const geoInfo = res;
-            if (res.error.length !== 0) {
-                retInsight.code = 404;
-                retInsight.body = {"error": "not a valid address"};
-                return retInsight;
-            } else {
-                newObj[hid + "_lat"] = res.lat;
-                newObj[hid + "_lon"] = res.lon;
-            }
-        });
-        */
-
-        //     buildInfo = newObj;
-        //     TempInfo = newObj;
-
-        // }else{
-        //     if (Object.keys(htmlResult).includes("childNodes")) {
-        //         for (let i = 0; i<htmlResult.childNodes.length; i++) {
-        //             this.htmlBuildInfoParse(htmlResult.childNodes[i], hid, buildInfo);
-        //         }
-        //     }
-        // }
-        //}
 
     }
 
-    // htmlRoomInfoParse(htmlResult:any,buildings:any, buildInfo:any,hid:string): any[] {
-    //     let retInsight: InsightResponse = {
-    //         code: null,
-    //         body: {}
-    //     };
-    //     let that = this;
-    //     let flag = []
-    //     var tBody = []
-    //     let result =[]
-    //     try {
-    //         flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1].childNodes[3]  //section
-    //             .childNodes[1].childNodes[5].childNodes[1].childNodes[3].childNodes[1].childNodes[3].childNodes
-    //         tBody = flag
-    //         for (let i =1; i < tBody.length; i+=2) {
-    //            // let p = new Promise(function (f,r) {
-    //                 let newObj: any = {};
-    //                 htmlResult = tBody[i]
-    //                 newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
-    //                 newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
-    //
-    //                 newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
-    //                 newObj[hid + "_address"] = buildInfo[hid + "_address"].trim();
-    //                 newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
-    //                 newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
-    //                 newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
-    //                 newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
-    //                 newObj[hid + "_lat"] = buildInfo[hid + "_lat"]
-    //                 newObj[hid + "_lon"] = buildInfo[hid + "_lon"]
-    //                 newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
-    //                 //f(newObj)
-    //                 result.push(newObj);
-    //             //})
-    //             //pArr.push(p);
-    //         }
-    //     } catch  (err) {
-    //         return []
-    //     }
-    //     return result;
-    // if (!isUndefined(flag)) {
-    //tBody = flag
-    // for (let i =1; i < tBody.length; i+=2) {
-    //     let newObj: any = {};
-    //     htmlResult = tBody[i]
-    //     newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
-    //     newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
-    //
-    //     newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
-    //     newObj[hid + "_address"] = buildInfo[hid + "_address"].trim();
-    //     newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
-    //     newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
-    //     newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
-    //     newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
-    //     newObj[hid + "_lat"] = buildInfo[hid + "_lat"]
-    //     newObj[hid + "_lon"] = buildInfo[hid + "_lon"]
-    //     newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
-    //     groomsInfoList.push(newObj);
-    // }
-
-    //  }
-    // if (!isUndefined(htmlResult) && htmlResult!==null && Object.keys(htmlResult).includes("nodeName")) {
-    //
-    //     if (htmlResult.nodeName === "tr" &&!isUndefined(htmlResult.attrs[0])&& (htmlResult.attrs[0].value.includes("odd") || htmlResult.attrs[0].value.includes("even"))) {
-
-    //  if (typeof htmlResult === 'object') {   ///keep of not?
-    //       let newObj: any = {};
-    //
-    //
-    //       newObj[hid + "_fullname"] = buildInfo[hid + "_fullname"].trim();
-    //       newObj[hid + "_shortname"] = buildings[buildInfo[hid + "_fullname"]][hid + "_shortname"].trim(); //where to find?
-    //
-    //       newObj[hid + "_number"] = htmlResult.childNodes[1].childNodes[1].childNodes[0].value.trim();
-    //       newObj[hid + "_address"] = buildInfo[hid + "_address"].trim();
-    //       newObj[hid + "_seats"] = htmlResult.childNodes[3].childNodes[0].value.trim();
-    //       newObj[hid + "_furniture"] = htmlResult.childNodes[5].childNodes[0].value.trim();
-    //       newObj[hid + "_type"] = htmlResult.childNodes[7].childNodes[0].value.trim();
-    //       newObj[hid + "_href"] = htmlResult.childNodes[9].childNodes[1].attrs[0].value.trim();
-    //
-    //       newObj[hid + "_name"] = (newObj[hid + "_shortname"] + "_" + newObj[hid + "_number"]).trim();
-
-
-
-    // newObj[hid + "_lat"] = buildInfo[hid + "_lat"].trim();
-    // newObj[hid + "_lon"] = buildInfo[hid + "_lon"].trim();
-
-    // groomsInfoList.push(newObj);
-
-    //  }
-    // } else{
-    //     if (Object.keys(htmlResult).includes("childNodes")) {
-    //         for (let i = 0; i<htmlResult.childNodes.length; i++) {
-    //             this.htmlRoomInfoParse(htmlResult.childNodes[i],buildings, buildInfo, hid);
-    //         }
-    // }
-    //}
-    //}
-    //  }
-
-    // htmlparse(html:any,buildings:any, hid:string): Promise<any>{
-    //     let that = this
-    //     var htmlResult = parse5.parse(html);
-    //     return that.htmlBuildInfoParse(htmlResult,hid);
-
-
-
-    // var roomsInfoList:any[] = [];
-    // console.log(TempInfo);
-    // if (validBuildings.includes(TempInfo.rooms_fullname)) {
-    //     this.htmlRoomInfoParse(htmlResult,buildings,TempInfo,hid,roomsInfoList);
-    // }
-    //return groomsInfoList;
-    // };
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
         let that = this;
@@ -368,18 +183,10 @@ export default class InsightFacade implements IInsightFacade {
 
         }
 
-        // if(content===null){
-        //     return new Promise(function (fullfill, reject){
-        //         insight.code = 400;
-        //         insight.body = {"error": "not a course or room"};
-        //         return reject(insight);
-        //     })
-        // }
         
         if (id === "rooms") {
             return new Promise(function (fulfill, reject) {
 
-                //if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
                     let listPromiseFiles: any[] = [];
 
@@ -398,16 +205,7 @@ export default class InsightFacade implements IInsightFacade {
 
                         let indexJS = htmldata[82];
 
-                        //if(that.htmlhelper(indexJS)){
-                            const document = parse5.parse(indexJS);
-                        //}else{
-                        //    return new Promise(function (fullfill, reject){
-                        //        insight.code = 400;
-                        //        insight.body = {"error": "not a course or room"};
-                        //        reject(insight);
-                        //        return;
-                        //    });
-                        //}
+                        const document = parse5.parse(indexJS);
 
                         //const document = parse5.parse(indexJS);
                         let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
@@ -435,7 +233,7 @@ export default class InsightFacade implements IInsightFacade {
                         }
                         gbulidings = buildings;
                         validBuildings = Object.keys(buildings);
-                        // console.log(validBuildings);
+
 
 
                         let allBuildingsInfoList: any[] = [];
@@ -480,7 +278,7 @@ export default class InsightFacade implements IInsightFacade {
 
                             }
                             let xyz = JSON.stringify(roomsInfoList);
-                            //if (fs.existsSync(id)) {fulfill(insight)}
+
                            // else {
                                 fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
@@ -511,53 +309,6 @@ export default class InsightFacade implements IInsightFacade {
                 })
             })
         }
-        // if (id === "rooms") {
-        //     return new Promise(function (fulfill, reject) {
-        //         jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
-        //             let listPromiseFiles: any[] = [];
-        //
-        //             data.forEach(function (r: any, f: any) {
-        //                 listPromiseFiles.push(f.async("string"));
-        //             });
-        //
-        //             let listFiles: any[] = [];
-        //             Promise.all(listPromiseFiles).then(function (htmldata) {
-        //                 for (let i = 6; i < 82; i++) {
-        //                     listFiles.push(htmldata[i])
-        //                 }
-        //                 //console.log(listFiles)
-        //                 let indexJS = htmldata[82];
-        //                 const document = parse5.parse(indexJS);
-        //                 let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
-        //                     .childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes[1]
-        //                     .childNodes[3];
-        //
-        //                 let lobuildings: any = [];
-        //                 let buildings: any = {};
-        //                 for (let i = 1; i < tree.childNodes.length; i += 2) {
-        //                     let tr = tree.childNodes[i]
-        //                     let sname = tr.childNodes[3].childNodes[0].value.trim()
-        //                     //console.log(sname)
-        //                     let fname = tr.childNodes[5].childNodes[1].childNodes[0].value.trim()
-        //                     //console.log(fname)
-        //                     let address = tr.childNodes[7].childNodes[0].value.trim()
-        //                     //console.log(address)
-        //                     let link = tr.childNodes[9].childNodes[1].attrs[0].value.trim()
-        //                     //console.log(link)
-        //                     let building = {
-        //                         rooms_fullname: fname, rooms_shortname: sname,
-        //                         rooms_address: address, link: link
-        //                     }
-        //                     //console.log(building)
-        //                     buildings[fname] = building;
-        //                 }
-        //                 console.log(buildings);
-        //
-        //             })
-        //         })
-        //         fulfill();
-        //     })
-        // }
 
         if (id === "courses") {
 
@@ -666,215 +417,7 @@ export default class InsightFacade implements IInsightFacade {
 
     }
     //
-    // findInfo(content: string, o: any): Object{
-    //     let that = this
-    //     if (typeof o !== 'object') return
-    //     if (Array.isArray(o)) return
-    //     let keys = Object.keys(o)
-    //     if (keys.indexOf('attrs') != -1) {
-    //         let attrs = o.attrs;
-    //         for (let each_attr of attrs) {
-    //             if (each_attr.name === 'class' && each_attr.value === 'views-table cols-5 table') {console.log('aaa')}
-    //
-    //         }
-    //     }
-    //
-    //     return 1;
-    // }
 
-    // addDataset(id: string, content: string): Promise<InsightResponse> {
-    //
-    //     let that = this;
-    //     let insight: InsightResponse = {
-    //         code: null,
-    //         body: {}
-    //     };
-    //
-    //     // id = courses
-    //     if (id === "courses") {
-    //         return new Promise(function (fulfill, reject) {
-    //         // if(id!=="courses"){
-    //         //     insight.code = 400;
-    //         //     insight.body = {"error": "not a course"};
-    //         //     return reject(insight);
-    //         // }
-    //
-    //         if(fs.existsSync(id)){
-    //             insight.code = 201;
-    //             insight.body = {"success": "exist"};
-    //
-    //         }else{
-    //             insight.code = 204;
-    //             insight.body = {"success": "not exist"};
-    //
-    //         }
-    //
-    //         jsz.loadAsync(content, {'base64': true}).then(function(data:any){ // data is zipObject
-    //
-    //             let listPromiseFiles:any[] = [];
-    //
-    //             data.forEach(function(r:any,f:any){
-    //
-    //                 listPromiseFiles.push(f.async("string"));
-    //             });
-    //
-    //             let listFiles:any[]=[];
-    //             Promise.all(listPromiseFiles).then(function(filedata){
-    //                 for(let eachIndex in filedata){
-    //                     if (that.helper(filedata[eachIndex])) {
-    //
-    //                         try {
-    //                             var each = JSON.parse(filedata[eachIndex]);
-    //                         } catch (err) {
-    //                             each = filedata[eachIndex];
-    //                         }
-    //
-    //                         if (typeof each === 'object') {
-    //                             for (let c of each['result']) {
-    //
-    //                                 if (c.length != 0) {
-    //                                     let newObj: any = {};
-    //
-    //                                     newObj[id + "_dept"] = c["Subject"];
-    //                                     newObj[id + "_id"] = c["Course"];
-    //                                     newObj[id + "_avg"] = c["Avg"];
-    //                                     newObj[id + "_instructor"] = c["Professor"];
-    //                                     newObj[id + "_title"] = c["Title"];
-    //                                     newObj[id + "_pass"] = c["Pass"];
-    //                                     newObj[id + "_fail"] = c["Fail"];
-    //                                     newObj[id + "_audit"] = c["Audit"];
-    //                                     newObj[id + "_uuid"] = c["id"];
-    //
-    //                                     listFiles.push(newObj);
-    //
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //
-    //                 let xyz = JSON.stringify(listFiles);
-    //                 fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
-    //
-    //                     if (fileerr) {
-    //                         insight.code = 400;
-    //                         insight.body = {"error": "can't write the content to disk"};
-    //                         return reject(insight);
-    //                     }
-    //
-    //                     fulfill(insight);
-    //                 });
-    //             }).catch(function(perr:any){
-    //                 insight.code = 400;
-    //                 insight.body = {"error": "can't write the content to disk"};
-    //                 reject(insight);
-    //             });
-    //
-    //         }).catch(function(e:any){
-    //             insight.code = 400;
-    //             insight.body = {"error": "can't write the content to disk"};
-    //             reject(insight);
-    //         });
-    //     });
-    //    }
-    //
-    //    else if (id === "rooms") {
-    //         return new Promise(function (fulfill, reject) {
-    //
-    //             jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
-    //                 //console.log(data)
-    //                 let listPromiseFiles: any[] = [];
-    //                 data.forEach(function (r: any, f: any) {
-    //                     listPromiseFiles.push(f.async("string"));
-    //                 });
-    //
-    //                 console.log(listPromiseFiles.length)
-    //
-    //                 Promise.all(listPromiseFiles).then(function (filedata) {
-    //                     let indexJS = filedata[82]
-    //                     const document = parse5.parse(indexJS)
-    //                     let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
-    //                         .childNodes[1].childNodes[3].childNodes[1].childNodes[5].childNodes[1]
-    //                         .childNodes[3]
-    //                     //that.findInfo('a', document.childNodes[6].childNodes[3].childNodes[1].parentNode)
-    //                     console.log(tree);
-    //                     let lobuildings: any = []
-    //                     let buildings: any = {}
-    //                     for (let i = 1; i < tree.childNodes.length; i += 2) {
-    //                         let tr = tree.childNodes[i]
-    //                         let sname = tr.childNodes[3].childNodes[0].value.trim()
-    //                         console.log(sname)
-    //                         let fname = tr.childNodes[5].childNodes[1].childNodes[0].value.trim()
-    //                         console.log(fname)
-    //                         let address = tr.childNodes[7].childNodes[0].value.trim()
-    //                         console.log(address)
-    //                         let link = tr.childNodes[9].childNodes[1].attrs[0].value.trim()
-    //                         console.log(link)
-    //                         let building = {
-    //                             rooms_fullname: fname, rooms_shortname: sname,
-    //                             rooms_address: address, link: link
-    //                         }
-    //                         console.log(building)
-    //                         buildings[fname] = building;
-    //                     }
-    //                     console.log(buildings)
-    //
-    //
-    //                     Object.keys(buildings).forEach((key: any) => {
-    //                         let file = buildings[key].link
-    //                         console.log(file)
-    //
-    //                     })
-    //
-    //
-    //                     fulfill('fulfill')
-    //                 }).catch(function (err: any) {
-    //                     console.log('fail')
-    //                     reject()
-    //                 })
-    //
-    //             }).catch(function (err: any) {
-    //                 console.log(err)
-    //                 reject()
-    //             });
-    //
-    //         });
-    //     }
-    //     else if ((id!=="rooms") && (id!=="courses")) {
-    //         return new Promise(function (fulfill, reject) {
-    //             insight.code = 400;
-    //             insight.body = {"error": "not a course nor a room"};
-    //             return reject(insight);
-    //         });
-    //     }
-    //
-    //
-    // }
-
-
-// Temporary removed from AddData
-// ------------------------------------------
-// let insight: InsightResponse = {
-//     code: null,
-//     body: {}
-// };
-//
-// if(id!=="courses"){
-//     insight.code = 400;
-//     insight.body = {"error": "not a course"};
-//     return reject(insight);
-// }
-//
-// if(fs.existsSync(id)){
-//     insight.code = 201;
-//     insight.body = {"success": "exist"};
-//
-// }else{
-//     insight.code = 204;
-//     insight.body = {"success": "not exist"};
-//
-// }
-// --------------------------------------------
 
     removeDataset(id: string): Promise<InsightResponse> {
 
@@ -932,13 +475,53 @@ export default class InsightFacade implements IInsightFacade {
 
             let where = query["WHERE"]
             let options = query["OPTIONS"]
-            for (let data of dataset[id]) {
-                if (that.parser(where, data)) {
-                    result.push(data)
+                for (let data of dataset[id]) {
+                    if (that.parser(where, data)) {
+                        result.push(data)
+                    }
                 }
+            //
+            if (Object.keys(query).includes("TRANSFORMATIONS")) {
+                let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+                let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
+
+                let applyTerms:any =[]  // ["rooms_seats"]
+                let applyKeys:any = [] //  ["MAX"]
+                let newKeys:any = [] // ["maxSeats"]
+                for (let i in apply) {
+                    newKeys.push(Object.keys(apply[i])[0])
+                    let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+                    applyKeys.push(Object.keys(applyEach)[0])
+                    applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+                }
+
+                let allCols = options["COLUMNS"]
+                let groupBy:any = []
+                for (let i in allCols) {
+                    if (that.isKey1(allCols[i]) || that.isKey2(allCols[i])) {
+                        groupBy.push(allCols[i])
+                    }
+                }
+                //let needPush:boolean = true
+                let r = result.reduce(function (res, obj) {
+                    if (that.needPush(res, obj, groupBy) === -1) {
+                        if (apply.length > 0) {
+                            obj = that.transform(obj, apply,applyKeys,applyTerms)
+                        }
+                        res.push(obj)
+                    } else {
+                        if (apply.length > 0) {
+                            let targetIndex = that.needPush(res, obj, groupBy)
+                            res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
+                        }
+                    }
+                    return res
+                }, [])
+
+                result = r
             }
+
             let filtereds: any[] = []
-            let keysForOpt = Object.keys(options)
             const allowed = options["COLUMNS"]
 
             for (let raw of result) {
@@ -948,40 +531,172 @@ export default class InsightFacade implements IInsightFacade {
                 }
                 filtereds.push(temp)
             }
+            let keysForOpt = Object.keys(options)
 
-            //const allowed = options["COLUMNS"]
-            // for (let raw of result) {
-            //     const filtered = Object.keys(raw)
-            //         .filter(key => allowed.includes(key))
-            //         .reduce((obj, key) => {
-            //             (<any>obj)[key] = (<any>raw)[key];
-            //             return obj;
-            //         }, {});
-            //     filtereds.push(filtered)
-            // }
+
             let sortOn =''
             if (keysForOpt.includes("ORDER")) {
                 let sortOn = options["ORDER"] // string
-
+                if (typeof sortOn === "string") {
                 filtereds.sort(function (a, b) {
                     if (a[sortOn] < b[sortOn])
                         return -1
-                    if ( a[sortOn] > b[sortOn])
+                    if (a[sortOn] > b[sortOn])
                         return 1
                     return 0
+                })
+                } else {
+                    let dir = sortOn["dir"]
+                    let keysToSort = sortOn["keys"]
+                    filtereds.sort(function (a, b) {
+                        if (dir === 'UP') {
+                            for (let i in keysToSort) {
+                                if (a[keysToSort[i]] < b[keysToSort[i]])
+                                    return -1
+                                if (a[keysToSort[i]] > b[keysToSort[i]])
+                                    return 1
+                            }
+                            return 0
+                        }else if (dir === 'DOWN') {
+                            for (let i in keysToSort) {
+                                if (a[keysToSort[i]] > b[keysToSort[i]])
+                                    return -1
+                                if (a[keysToSort[i]] < b[keysToSort[i]])
+                                    return 1
+                            }
+                            return 0
+                        }
+                    })
 
-                });
-
+                }
             }
 
-            fulfill({code: 200, body: {result: filtereds}})
-            // } catch (err){
-            //     console.log("shouldn't have been here")
+            // if (Object.keys(query).includes("TRANSFORMATIONS")) {
+            //     let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+            //     let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
+            //
+            //     let applyTerms:any =[]  // ["rooms_seats"]
+            //     let applyKeys:any = [] //  ["MAX"]
+            //     let newKeys:any = [] // ["maxSeats"]
+            //     for (let i in apply) {
+            //         newKeys.push(Object.keys(apply[i])[0])
+            //         let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+            //         applyKeys.push(Object.keys(applyEach)[0])
+            //         applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+            //     }
+            //
+            //     let allCols = options["COLUMNS"]
+            //     let groupBy:any = []
+            //     for (let i in allCols) {
+            //         if (that.isKey1(allCols[i]) || that.isKey2(allCols[i])) {
+            //             groupBy.push(allCols[i])
+            //         }
+            //     }
+            //     //let needPush:boolean = true
+            //     let r = filtereds.reduce(function (res, obj) {
+            //         if (that.needPush(res, obj, groupBy) === -1) {
+            //             if (apply.length > 0) {
+            //                 obj = that.transform(obj, apply,applyKeys,applyTerms)
+            //             }
+            //             res.push(obj)
+            //         } else {
+            //             if (apply.length > 0) {
+            //                 let targetIndex = that.needPush(res, obj, groupBy)
+            //                 res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
+            //             }
+            //         }
+            //         return res
+            //     }, [])
+            //
+            //     filtereds = r
             // }
-
+            fulfill({code: 200, body: {result: filtereds}})
         })
 
     }
+
+    transform(obj:any, apply: any, applyKeys:any, applyTerms:any): any {
+        // if apply, change name and initialize
+        let that = this
+        for (let i in apply) {
+            let newName = Object.keys(apply[i])[0]
+            let oldName = applyTerms[i]
+            let token = applyKeys[i]
+
+            obj[newName] = that.initializeValue(obj, oldName, token)
+            delete obj[oldName]
+        }
+        return obj
+    }
+
+    initializeValue(obj: any, oldName:any, token:any):any {
+        switch (token) {
+            case "MAX" :
+                return obj[oldName];
+            case "MIN" :
+                return obj[oldName];
+            case "AVG" :
+                return obj[oldName];
+            case "COUNT" :
+                return 1;
+            case "SUM" :
+                return obj[oldName];
+        }
+    }
+
+    updateRow(obj:any, row:any, apply:any, applyKeys:any, applyTerms:any):any {
+        // update the specified field
+        let that = this
+        for (let i in apply) {
+            let newName = Object.keys(apply[i])[0]
+            let oldName = applyTerms[i]
+            let token = applyKeys[i]
+
+            row[newName] = that.updateTerm(row[newName], obj[oldName], token)
+        }
+        return row
+    }
+
+    updateTerm(prev:any, cur:any, token:any):any {
+        switch (token) {
+            case "MAX" :
+                if (prev < cur) return cur;
+            case "MIN" :
+                if (prev > cur) return cur;
+            case "AVG" :
+                return prev + cur
+            case "COUNT" :
+                return prev + 1
+            case "SUM" :
+                return prev + cur
+        }
+    }
+
+
+    needPush(res:any, obj:any,groupBy:any):any {
+        let that = this
+        for (let i in res) {
+            if (that.containAll(res[i], obj, groupBy)) {
+                return i
+            }
+        }
+        return -1; // need push
+    }
+
+    containAll(row:any, obj:any,groupBy:any): boolean{
+        for (let col in groupBy) {
+            let keys = Object.keys(row)
+            let values: any = []
+            for (let i in keys) {
+                values.push(row[keys[i]])
+            }
+            if (!values.includes(obj[groupBy[col]])) {
+                return false
+            }
+        }
+        return true
+    }
+
 
     getID(query: any): string {
         let that = this
@@ -994,7 +709,13 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         if (query === null || query === {}) return false;
         let keys = Object.keys(query)
-        if (keys.length !== 2 || (!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+        if (keys.length < 2 || keys.length > 3) return false
+        if (keys.length === 2) {
+            if ((!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+        }
+        if (keys.length === 3) {
+            if ((!keys.includes("WHERE")) || (!keys.includes("OPTIONS")) || (!keys.includes("TRANSFORMATIONS"))) return false;
+        }
 
 
         let obj1 = query["WHERE"]
@@ -1006,23 +727,91 @@ export default class InsightFacade implements IInsightFacade {
         let colItems = obj2["COLUMNS"]
 
         if ((!Array.isArray(colItems)) || colItems.length === 0) return false
-        for (let i of colItems) {
-            if (!that.isKey1(i)) {
-                return false
+
+        if (!keys.includes("TRANSFORMATIONS")) {
+            for (let i of colItems) {
+                if (!that.isKey1(i)) {
+                    return false
+                }
+            }
+        } else {
+            let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+            let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
+
+            for (let i of group) {
+                if (!that.isKey1(i)) {
+                    return false
+                }
+            }
+            // group terms valid
+
+            let applyTerms:any =[]  // ["rooms_seats"]
+            let applyKeys:any = [] //  ["MAX"]
+            let newKeys:any = [] // ["maxSeats"]
+            for (let i in apply) {
+                newKeys.push(Object.keys(apply[i])[0])
+                let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+                applyKeys.push(Object.keys(applyEach)[0])
+                applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+            }
+
+            for (let i of applyKeys) {
+                if (!that.isToken(i)) {
+                    return false
+                }
+            }
+
+            for (let i of applyTerms) {
+                if (applyKeys[i] === "COUNT") {
+                    if (!that.isKey1(i)) {
+                        return false
+                    }
+                } else {
+                    if (!that.ismKey1(i)) {
+                        return false
+                    }
+                }
+            }
+            //group, apply are all valid keys
+
+            // make sure colItems is from group or apply
+            for (let i of colItems) {
+                if (!group.includes(i) && !newKeys.includes(i)) {
+                    return false
+                }
             }
         }
+
+
         if (conds.includes("ORDER")) {
             let order = obj2["ORDER"]
-            if (!that.isKey1(order)) return false
-            if (!colItems.includes(order)) return false
+            if (typeof order === "string") {
+                if (!that.isKey1(order)) return false
+                if (!colItems.includes(order)) return false
+            } else { // multiple fields
+                let orderKeys = Object.keys(order)
+                if (orderKeys.length !== 2 || orderKeys[0] !== "dir" || (order["dir"] !== "UP" && order["dir"] !== "DOWN")
+                    ||orderKeys[1] !== "keys") {
+                    return false
+                }
+                let fields = order["keys"]
+                for (let i in fields) {
+                    if (!that.isKey1(fields[i])) return false
+                    if (!colItems.includes(fields[i])) return false
+                }
+            }
         }
 
-        // now OPTIONS is all good
+        // now OPTIONS is all OK
         if (!that.isValidFilter1(obj1)) return false;
 
         return true
     }
 
+    isToken(t:any): boolean {
+        if (typeof t !== 'string') return false
+        return (t === 'MAX')||(t === 'MIN')||(t === 'AVG')||(t === 'SUM')||(t === 'COUNT')
+    }
 
     isKey1(item: any): boolean {
         let that = this;
@@ -1044,7 +833,8 @@ export default class InsightFacade implements IInsightFacade {
         if (!(obj instanceof Object)) {
             return false;
         }
-        if (Object.keys(obj).length != 1) return false
+        if (Object.keys(obj).length === 0) return true
+        if (Object.keys(obj).length > 1) return false
         let key = Object.keys(obj)[0]
 
         if (key === "AND" || key === "OR") {
@@ -1077,6 +867,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     parser(filter: any, data: any) : boolean {
+        if (Object.keys(filter).length === 0) return true
         let key = Object.keys(filter)[0]
         let obj = filter[key]   // may be object or array
 
@@ -1108,7 +899,7 @@ export default class InsightFacade implements IInsightFacade {
             if (val[0] === "*" && val[val.length - 1] !== "*") {
                 let subString = val.substring(1,val.length)
                 if (data[field].length < subString.length) return false
-                return data[field].indexOf(subString) === data[field].length - subString.length
+                return data[field].indexOf(subString, data[field].length - subString.length) !== -1;
             }
             if (val[0] !== "*" && val[val.length - 1] === "*") {
                 let subString = val.substring(0,val.length-1)
@@ -1142,7 +933,13 @@ export default class InsightFacade implements IInsightFacade {
 
         if (query === null || query === {}) return false;
         let keys = Object.keys(query)
-        if (keys.length !== 2 || (!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+        if (keys.length < 2 || keys.length > 3) return false
+        if (keys.length === 2) {
+            if ((!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+        }
+        if (keys.length === 3) {
+            if ((!keys.includes("WHERE")) || (!keys.includes("OPTIONS")) || (!keys.includes("TRANSFORMATIONS"))) return false;
+        }
 
 
         let obj1 = query["WHERE"]
@@ -1154,15 +951,84 @@ export default class InsightFacade implements IInsightFacade {
         let colItems = obj2["COLUMNS"]
 
         if ((!Array.isArray(colItems)) || colItems.length === 0) return false
-        for (let i of colItems) {
-            if (!that.isKey2(i)) {
-                return false
+        // for (let i of colItems) {
+        //     if (!that.isKey2(i)) {
+        //         return false
+        //     }
+        // }
+
+        if (!keys.includes("TRANSFORMATIONS")) {
+            for (let i of colItems) {
+                if (!that.isKey2(i)) {
+                    return false
+                }
+            }
+        } else {
+            let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+            let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
+
+            for (let i of group) {
+                if (!that.isKey2(i)) {
+                    return false
+                }
+            }
+            // group terms valid
+
+            let applyTerms:any =[]  // ["rooms_seats"]
+            let applyKeys:any = [] //  ["MAX"]
+            let newKeys:any = [] // ["maxSeats"]
+            for (let i in apply) {
+                newKeys.push(Object.keys(apply[i])[0])
+                let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+                applyKeys.push(Object.keys(applyEach)[0])
+                applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+            }
+
+            for (let i of applyKeys) {
+                if (!that.isToken(i)) {
+                    return false
+                }
+            }
+
+            for (let i of applyTerms) {
+                if (applyKeys[i] === "COUNT") {
+                    if (!that.isKey2(i)) {
+                        return false
+                    }
+                } else {
+                    if (!that.ismKey2(i)) {
+                        return false
+                    }
+                }
+            }
+            //group, apply are all valid keys
+
+            // make sure colItems is from group or apply
+            for (let i of colItems) {
+                if (!group.includes(i) && !newKeys.includes(i)) {
+                    return false
+                }
             }
         }
+
+
         if (conds.includes("ORDER")) {
             let order = obj2["ORDER"]
-            if (!that.isKey2(order)) return false
-            if (!colItems.includes(order)) return false
+            if (typeof order === "string") {
+                if (!that.isKey2(order)) return false
+                if (!colItems.includes(order)) return false
+            } else { // multiple fields
+                let orderKeys = Object.keys(order)
+                if (orderKeys.length !== 2 || orderKeys[0] !== "dir" || (order["dir"] !== "UP" && order["dir"] !== "DOWN")
+                    ||orderKeys[1] !== "keys") {
+                    return false
+                }
+                let fields = order["keys"]
+                for (let i in fields) {
+                    if (!that.isKey2(fields[i])) return false
+                    if (!colItems.includes(fields[i])) return false
+                }
+            }
         }
 
         // now OPTIONS is all good
@@ -1192,7 +1058,8 @@ export default class InsightFacade implements IInsightFacade {
         if (!(obj instanceof Object)) {
             return false;
         }
-        if (Object.keys(obj).length != 1) return false
+        if (Object.keys(obj).length === 0) return true
+        if (Object.keys(obj).length > 1) return false
         let key = Object.keys(obj)[0]
 
         if (key === "AND" || key === "OR") {

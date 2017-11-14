@@ -1313,6 +1313,52 @@ describe("Test", function() {
     });
 
 
+    it("Rtest3", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "OR":[{
+                        "AND":[{"NOT": {"NOT":{
+                            "NOT": {"OR": [{"GT":{
+                                "courses_year":1900
+                            }}, {"AND": [{"NOT": {"NOT": {"NOT": {"LT": {"courses_avg":0}}}}}]}]}}}}, {"OR":[{"IS":{
+                            "courses_instructor": "*lis*"
+                        }
+                        },{
+                            "IS":{
+                                "courses_dept":"cpsc"
+                            }
+                        }
+
+                        ]}
+                        ]},{"EQ":{
+                        "courses_avg":98
+
+                    }}]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_instructor",
+                        "courses_year",
+                        "courses_avg"
+                    ],
+                    "ORDER":"courses_avg"
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                result: [{
+                    "courses_instructor": "maillard, keith", "courses_year":2013, "courses_avg":98
+                }, {
+                    "courses_instructor": "grady, albert wayne", "courses_year":2013, "courses_avg":98
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
 
     it("RtestForUCLL", function() {
         return IF.performQuery({
@@ -1383,6 +1429,356 @@ describe("Test", function() {
             expect.fail();
         })
     });
+
+    //********************************* D3
+
+    // **************************************new query!!
+
+
+    it("D3testSample1", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 300
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "maxSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["maxSeats"]  // or "keys": "maxSeats"
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "maxSeats": {
+                            "MAX": "rooms_seats"
+                        }
+                    }]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "OSBO",
+                    "maxSeats": 442
+                }, {
+                    "rooms_shortname": "HEBB",
+                    "maxSeats": 375
+                }, {
+                    "rooms_shortname": "LSC",
+                    "maxSeats": 350
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+
+    it("D3testSample2", function() {
+        return IF.performQuery(       {
+                "WHERE": {},
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_furniture"
+                    ],
+                    "ORDER": "rooms_furniture"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_furniture"],
+                    "APPLY": []
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs"
+                }, {
+                    "rooms_furniture": "Classroom-Fixed Tables/Movable Chairs"
+                }, {
+                    "rooms_furniture": "Classroom-Fixed Tables/Moveable Chairs"
+                }, {
+                    "rooms_furniture": "Classroom-Fixed Tablets"
+                }, {
+                    "rooms_furniture": "Classroom-Hybrid Furniture"
+                }, {
+                    "rooms_furniture": "Classroom-Learn Lab"
+                }, {
+                    "rooms_furniture": "Classroom-Movable Tables & Chairs"
+                }, {
+                    "rooms_furniture": "Classroom-Movable Tablets"
+                }, {
+                    "rooms_furniture": "Classroom-Moveable Tables & Chairs"
+                }, {
+                    "rooms_furniture": "Classroom-Moveable Tablets"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+
+    it("D3testSort", function() {
+        return IF.performQuery(       {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 300
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname"
+                    ]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "OSBO"
+                }, {
+                    "rooms_shortname": "LSC"
+                }, {
+                    "rooms_shortname": "LSC"
+                }, {
+                    "rooms_shortname": "HEBB"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it("D3testSortOneKey", function() {
+        return IF.performQuery(         {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 270
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname","rooms_number"
+                    ],
+                    "ORDER": {
+                        "dir": "UP",
+                        "keys": ["rooms_shortname"]}
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "HEBB","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "LSC","rooms_number":"1001"
+                }, {
+                    "rooms_shortname": "LSC","rooms_number":"1002"
+                }, {
+                    "rooms_shortname": "OSBO","rooms_number":"A"
+                }, {
+                    "rooms_shortname": "SRC","rooms_number":"220C"
+                },{
+                    "rooms_shortname": "SRC","rooms_number":"220A"
+                },{
+                    "rooms_shortname": "SRC","rooms_number":"220B"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it("D3testSortTwoKeys", function() {
+        return IF.performQuery(         {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 270
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname","rooms_number"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname","rooms_number"]}
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "SRC","rooms_number":"220C"
+                }, {
+                    "rooms_shortname": "SRC","rooms_number":"220B"
+                }, {
+                    "rooms_shortname": "SRC","rooms_number":"220A"
+                }, {
+                    "rooms_shortname": "OSBO","rooms_number":"A"
+                }, {
+                    "rooms_shortname": "LSC","rooms_number":"1002"
+                },{
+                    "rooms_shortname": "LSC","rooms_number":"1001"
+                },{
+                    "rooms_shortname": "HEBB","rooms_number":"100"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it("D3testSortTwoKeys2", function() {
+        return IF.performQuery(         {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_number": "*00"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 200
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname","rooms_number"
+                    ],
+                    "ORDER": {
+                        "dir": "UP",
+                        "keys": ["rooms_number","rooms_shortname"]}
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "GEOG","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "HEBB","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "MATH","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "SCRF","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "WESB","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "HENN","rooms_number":"200"
+                }, {
+                    "rooms_shortname": "LSK","rooms_number":"200"
+                }, {
+                    "rooms_shortname": "BIOL","rooms_number":"2000"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    // **** test Group without Apply
+
+    it( "D3testGroupNoApply", function() {
+        return IF.performQuery(   {"WHERE": {
+                "IS": {"rooms_shortname": "*K*"}
+            },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname"
+
+
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname"]
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [
+                    ]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "SOWK"
+                }, {
+                    "rooms_shortname": "LSK"
+                }, {
+                    "rooms_shortname": "BRKX"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //
     // // remove
@@ -1469,7 +1865,6 @@ describe("Test", function() {
         })
     });
 
-    //*****************
     //perform query after remove
     it("RtestComplexOr1111111 AfterRemove", function() {
         return IF.performQuery({
@@ -1490,6 +1885,10 @@ describe("Test", function() {
             expect(err.code).eq(424);
         })
     });
+
+
+
+
 
 
 })
