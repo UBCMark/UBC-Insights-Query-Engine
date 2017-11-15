@@ -28,8 +28,8 @@ describe("EchoSpec", function () {
 
     var IF: InsightFacade = null;
     beforeEach(function () {
-        IF = new InsightFacade();
 
+        IF = new InsightFacade();
     });
 
 
@@ -49,45 +49,6 @@ describe("EchoSpec", function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
     });
 
-    // let content: string = "";
-    //
-    // content = fs.readFileSync("./rooms.zip", {encoding: "base64"})
-    // console.log(content)
-
-    // it("Test", function () {
-    //     return IF.addDataset("rooms", content).then(function (data) {
-    //         let dataset: any = {};
-    //         let id = "rooms"
-    //         let id2 = "courses"
-    //         dataset["rooms"] = 123;
-    //         dataset[id2] = 321
-    //         console.log(dataset)
-    //         console.log('success')
-    //     }).catch(function (err) {
-    //         console.log('testfail')
-    //     })
-    // });
-
-
-    // it("Test2", function () {
-    //     return IF.performQuery({
-    //         "WHERE": {
-    //             "IS": {
-    //                 "rooms_name": "DMP_*"
-    //             }
-    //         },
-    //         "OPTIONS": {
-    //             "COLUMNS": [
-    //                 "rooms_name"
-    //             ],
-    //             "ORDER": "rooms_name"
-    //         }
-    //     }).then(function (data) {
-    //         console.log('query success')
-    //     }).catch(function (err) {
-    //         console.log('query testfail')
-    //     })
-    // });
 
     //
     it("Should be able to echo", function () {

@@ -48,6 +48,7 @@ describe("InsightFacadeSpec", function () {
         insightFacade = null;
     });
 
+
     it('Test for an empty courses.', function () {
 
         return insightFacade.addDataset("courses", contentEmpty).then(function (response: InsightResponse) {
@@ -76,10 +77,13 @@ describe("InsightFacadeSpec", function () {
         });
     });
 
+
+
     it("test addDataset courses.zip", function () {
         return insightFacade.addDataset("courses", content).then(function (data) {
             expect(fs.existsSync("courses")).eq(true);
             expect(data.code).eq(204);
+            console.log(data.code)
         }).catch(function (err) {
             console.log(err);
 
@@ -114,6 +118,7 @@ describe("InsightFacadeSpec", function () {
         });
     });
 
+
     it("test addDataset rooms.zip", function () {
         return insightFacade.addDataset("rooms", content2).then(function (data) {
             expect(fs.existsSync("rooms")).eq(true);
@@ -123,6 +128,7 @@ describe("InsightFacadeSpec", function () {
 
         });
     });
+
 
     it("test addDataset204/201", function () {
 
