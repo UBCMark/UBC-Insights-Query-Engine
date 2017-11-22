@@ -7,6 +7,7 @@ import restify = require('restify');
 
 import Log from "../Util";
 import {InsightResponse} from "../controller/IInsightFacade";
+import InsightFacade from "../controller/InsightFacade";
 
 /**
  * This configures the REST endpoints for the server.
@@ -15,6 +16,7 @@ export default class Server {
 
     private port: number;
     private rest: restify.Server;
+    private static iFacade = new InsightFacade();
 
     constructor(port: number) {
         Log.info("Server::<init>( " + port + " )");
@@ -37,6 +39,83 @@ export default class Server {
         });
     }
 
+    private putDataset(req:restify.Request, res:restify.Response, next:restify.Next){
+        //Get the dataset data coming from the request
+        let dataStr = new Buffer(req.params.body).toString('base64');
+
+        //let iFacade = new InsightFacade();
+        let datasetName = req.params.id;
+
+        let value = Server.iFacade.addDataset(datasetName,dataStr);
+
+        value.then(function (values:any) {
+            //Write to response object the code the code you're returning
+            res.status(values.code);
+
+            //Write to response object the json data you're returning
+            res.json(values);
+
+            //return this
+            return next();
+        }).catch(function (err:any) {
+            res.send(err.code);
+            return next();
+
+        })
+    }
+
+    private removeDataset(req:restify.Request, res:restify.Response, next:restify.Next){
+        //Get the dataset data coming from the request
+        //let dataStr = new Buffer(req.params.body).toString('base64');
+
+       // let iFacade = new InsightFacade();
+        let datasetName = req.params.id;
+
+
+        let value = Server.iFacade.removeDataset(datasetName);
+
+        value.then(function (values:any) {
+            //Write to response object the code the code you're returning
+            res.status(values.code);
+
+            //Write to response object the json data you're returning
+            res.json(values);
+
+            //return this
+            return next();
+        }).catch(function (err:any) {
+            res.send(err.code);
+            return next();
+        })
+    }
+
+    private performQuery(req:restify.Request, res:restify.Response, next:restify.Next){
+        //Get the dataset data coming from the request
+        //let dataStr = new Buffer(req.params.body).toString('base64');
+
+      //  let iFacade = new InsightFacade();
+        //let datasetName = req.params.id;
+        let queryParameter = req.body;
+
+
+        let value = Server.iFacade.performQuery(queryParameter);
+
+        value.then(function (values:any) {
+            //Write to response object the code the code you're returning
+            res.status(values.code);
+
+            //Write to response object the json data you're returning
+            res.json(values);
+
+            //return this
+            return next();
+        }).catch(function (err:any) {
+            res.send(err.code);
+            return next;
+        })
+    }
+
+
     /**
      * Starts the server. Returns a promise with a boolean value. Promises are used
      * here because starting the server takes some time and we want to know when it
@@ -53,6 +132,7 @@ export default class Server {
                 that.rest = restify.createServer({
                     name: 'insightUBC'
                 });
+                that.rest.use(restify.bodyParser({mapParams: true, mapFiles: true}));
 
                 // support CORS
                 that.rest.use(function crossOrigin(req, res, next) {
@@ -71,6 +151,10 @@ export default class Server {
                 that.rest.get('/echo/:msg', Server.echo);
 
                 // Other endpoints will go here
+
+                that.rest.put('/dataset/:id',that.putDataset);
+                that.rest.post('/query',that.performQuery);
+                that.rest.del('/dataset/:id',that.removeDataset);
 
                 that.rest.listen(that.port, function () {
                     Log.info('Server::start() - restify listening: ' + that.rest.url);

@@ -1360,7 +1360,7 @@ describe("Test", function() {
             expect.fail();
         })
     });
-    
+
     it("RtestForUCLL", function() {
         return IF.performQuery({
                 "WHERE": {
