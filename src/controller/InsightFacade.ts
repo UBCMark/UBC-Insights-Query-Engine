@@ -488,45 +488,45 @@ export default class InsightFacade implements IInsightFacade {
             }
             //
             let tresult:any = [];
-            if (Object.keys(query).includes("TRANSFORMATIONS")) {
-                let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
-                let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
-
-                let applyTerms:any =[]  // ["rooms_seats"]
-                let applyKeys:any = [] //  ["MAX"]
-                let newKeys:any = [] // ["maxSeats"]
-                for (let i in apply) {
-                    newKeys.push(Object.keys(apply[i])[0])
-                    let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
-                    applyKeys.push(Object.keys(applyEach)[0])
-                    applyTerms.push(applyEach[Object.keys(applyEach)[0]])
-                }
-
-                let allCols = options["COLUMNS"]
-                // let groupBy:any = []
-                // for (let i in allCols) {
-                //     if (that.isKey1(allCols[i]) || that.isKey2(allCols[i]) || ) {
-                //         groupBy.push(allCols[i])
-                //     }
-                // }
-                //let needPush:boolean = true
-                let r = result.reduce(function (res, obj) {
-                    if (that.needPush(res, obj, group) === -1) {
-                        if (apply.length > 0) {
-                            obj = that.transform(obj, apply,applyKeys,applyTerms)
-                        }
-                        res.push(obj)
-                    } else {
-                        if (apply.length > 0) {
-                            let targetIndex = that.needPush(res, obj, group)
-                            res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
-                        }
-                    }
-                    return res
-                }, [])
-
-                tresult = r
-            }
+            // if (Object.keys(query).includes("TRANSFORMATIONS")) {
+            //     let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+            //     let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
+            //
+            //     let applyTerms:any =[]  // ["rooms_seats"]
+            //     let applyKeys:any = [] //  ["MAX"]
+            //     let newKeys:any = [] // ["maxSeats"]
+            //     for (let i in apply) {
+            //         newKeys.push(Object.keys(apply[i])[0])
+            //         let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+            //         applyKeys.push(Object.keys(applyEach)[0])
+            //         applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+            //     }
+            //
+            //     let allCols = options["COLUMNS"]
+            //     // let groupBy:any = []
+            //     // for (let i in allCols) {
+            //     //     if (that.isKey1(allCols[i]) || that.isKey2(allCols[i]) || ) {
+            //     //         groupBy.push(allCols[i])
+            //     //     }
+            //     // }
+            //     //let needPush:boolean = true
+            //     let r = result.reduce(function (res, obj) {
+            //         if (that.needPush(res, obj, group) === -1) {
+            //             if (apply.length > 0) {
+            //                 obj = that.transform(obj, apply,applyKeys,applyTerms)
+            //             }
+            //             res.push(obj)
+            //         } else {
+            //             if (apply.length > 0) {
+            //                 let targetIndex = that.needPush(res, obj, group)
+            //                 res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
+            //             }
+            //         }
+            //         return res
+            //     }, [])
+            //
+            //     tresult = r
+            // }
 
             let filtereds: any[] = []
             const allowed = options["COLUMNS"]
