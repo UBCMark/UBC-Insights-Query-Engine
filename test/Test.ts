@@ -589,7 +589,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-             
+
             expect(result.body).to.deep.equal({
                 result:
                     [
@@ -638,7 +638,7 @@ describe("Test", function() {
 
         ).then(function (result: any) {
             Log.test("successful query!");
-             
+
             expect(result.body).to.deep.equal({
                 result:
                     [
@@ -874,7 +874,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-             
+
             expect(result.body).to.deep.equal({
                 result:
                     [ { courses_dept: 'adhe', courses_id: '329', courses_avg: 90.02 },
@@ -1136,7 +1136,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-             
+
             expect(result.body).to.deep.equal({
                 result:
                     [ {rooms_name: 'WOOD_G53', rooms_furniture: 'Classroom-Movable Tables & Chairs', rooms_address: '2194 Health Sciences Mall'},
@@ -1167,7 +1167,7 @@ describe("Test", function() {
             }
         ).then(function (result: any) {
             Log.test("successful query!");
-             
+
             expect(result.body).to.deep.equal({
                 result: [{
                     "rooms_name": "UCLL_101"
@@ -1264,6 +1264,7 @@ describe("Test", function() {
             expect.fail();
         })
     });
+
 
     it("RtestComplexOr", function() {
         return IF.performQuery({
@@ -1437,12 +1438,12 @@ describe("Test", function() {
         })
     });
 
-
-
-    //********************************* D3
-
-    // **************************************new query!!
-
+//
+//
+//     //********************************* D3
+//
+//     // **************************************new query!!
+//
 
     it("D3testSample1", function() {
         return IF.performQuery(   {
@@ -1545,6 +1546,7 @@ describe("Test", function() {
     });
 
 
+
     it("D3testSort", function() {
         return IF.performQuery(       {
                 "WHERE": {
@@ -1584,6 +1586,7 @@ describe("Test", function() {
         })
     });
 
+
     it("D3testSortOneKey", function() {
         return IF.performQuery(         {
                 "WHERE": {
@@ -1603,7 +1606,7 @@ describe("Test", function() {
                     ],
                     "ORDER": {
                         "dir": "UP",
-                        "keys": ["rooms_shortname"]}
+                        "keys": ["rooms_shortname", "rooms_number"]}
                 }
             }
         ).then(function (result: any) {
@@ -1619,11 +1622,11 @@ describe("Test", function() {
                 }, {
                     "rooms_shortname": "OSBO","rooms_number":"A"
                 }, {
-                    "rooms_shortname": "SRC","rooms_number":"220C"
-                },{
                     "rooms_shortname": "SRC","rooms_number":"220A"
                 },{
                     "rooms_shortname": "SRC","rooms_number":"220B"
+                },{
+                    "rooms_shortname": "SRC","rooms_number":"220C"
                 }]
             });
         }).catch(function (err) {
@@ -1631,6 +1634,7 @@ describe("Test", function() {
             expect.fail();
         })
     });
+
 
     it("D3testSortTwoKeys", function() {
         return IF.performQuery(         {
@@ -1729,9 +1733,9 @@ describe("Test", function() {
             expect.fail();
         })
     });
-
-    // **** test Group without Apply
-
+//
+//     // **** test Group without Apply
+//
     it( "D3testGroupNoApply", function() {
         return IF.performQuery(   {"WHERE": {
                 "IS": {"rooms_shortname": "*K*"}
@@ -1771,26 +1775,26 @@ describe("Test", function() {
         })
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //
-    // // remove
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//     //
+//     // // remove
     it("test removeDataset", function () {
 
         IF.removeDataset("courses").then(function (data) {
@@ -1894,9 +1898,9 @@ describe("Test", function() {
             expect(err.code).eq(424);
         })
     });
-
-
-
-
-
-})
+//
+//
+//
+//
+//
+ })

@@ -465,28 +465,29 @@ export default class InsightFacade implements IInsightFacade {
 
             // Query OK, decide which dataset to perform query on
 
-                // try {
-                //let dataset: any = {};
-                let id = that.getID(query)
+            // try {
+            //let dataset: any = {};
+            let id = that.getID(query)
 
-                 let result: any[] = []
-                try {
-                        if (!Object.keys(dataset).includes(id) || dataset[id].length === 0) {
-                            dataset[id] = JSON.parse(fs.readFileSync(id))
-                        }
+            let result: any[] = []
+            try {
+                // if (!Object.keys(dataset).includes(id) || dataset[id].length === 0) {
+                    dataset[id] = JSON.parse(fs.readFileSync(id))
+               // }
 
-                } catch (err) {
-                    reject({code: 424, body: {"error": "missing dataset"}})
-                }
+            } catch (err) {
+                reject({code: 424, body: {"error": "missing dataset"}})
+            }
 
             let where = query["WHERE"]
             let options = query["OPTIONS"]
-                for (let data of dataset[id]) {
-                    if (that.parser(where, data)) {
-                        result.push(data)
-                    }
+            for (let data of dataset[id]) {
+                if (that.parser(where, data)) {
+                    result.push(data)
                 }
+            }
             //
+            let tresult:any = [];
             if (Object.keys(query).includes("TRANSFORMATIONS")) {
                 let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
                 let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
@@ -502,41 +503,52 @@ export default class InsightFacade implements IInsightFacade {
                 }
 
                 let allCols = options["COLUMNS"]
-                let groupBy:any = []
-                for (let i in allCols) {
-                    if (that.isKey1(allCols[i]) || that.isKey2(allCols[i])) {
-                        groupBy.push(allCols[i])
-                    }
-                }
+                // let groupBy:any = []
+                // for (let i in allCols) {
+                //     if (that.isKey1(allCols[i]) || that.isKey2(allCols[i]) || ) {
+                //         groupBy.push(allCols[i])
+                //     }
+                // }
                 //let needPush:boolean = true
                 let r = result.reduce(function (res, obj) {
-                    if (that.needPush(res, obj, groupBy) === -1) {
+                    if (that.needPush(res, obj, group) === -1) {
                         if (apply.length > 0) {
                             obj = that.transform(obj, apply,applyKeys,applyTerms)
                         }
                         res.push(obj)
                     } else {
                         if (apply.length > 0) {
-                            let targetIndex = that.needPush(res, obj, groupBy)
+                            let targetIndex = that.needPush(res, obj, group)
                             res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
                         }
                     }
                     return res
                 }, [])
 
-                result = r
+                tresult = r
             }
 
             let filtereds: any[] = []
             const allowed = options["COLUMNS"]
 
-            for (let raw of result) {
-                let temp: any = {}
-                for (let field of allowed) {
-                    temp[field] = raw[field]
+            if (tresult.length === 0) { //
+                for (let raw of result) {
+                    let temp: any = {}
+                    for (let field of allowed) {
+                        temp[field] = raw[field]
+                    }
+                    filtereds.push(temp)
                 }
-                filtereds.push(temp)
+            } else {
+                for (let raw of tresult) {
+                    let temp: any = {}
+                    for (let field of allowed) {
+                        temp[field] = raw[field]
+                    }
+                    filtereds.push(temp)}
             }
+
+
             let keysForOpt = Object.keys(options)
 
 
@@ -544,13 +556,13 @@ export default class InsightFacade implements IInsightFacade {
             if (keysForOpt.includes("ORDER")) {
                 let sortOn = options["ORDER"] // string
                 if (typeof sortOn === "string") {
-                filtereds.sort(function (a, b) {
-                    if (a[sortOn] < b[sortOn])
-                        return -1
-                    if (a[sortOn] > b[sortOn])
-                        return 1
-                    return 0
-                })
+                    filtereds.sort(function (a, b) {
+                        if (a[sortOn] < b[sortOn])
+                            return -1
+                        if (a[sortOn] > b[sortOn])
+                            return 1
+                        return 0
+                    })
                 } else {
                     let dir = sortOn["dir"]
                     let keysToSort = sortOn["keys"]
@@ -577,7 +589,7 @@ export default class InsightFacade implements IInsightFacade {
                 }
             }
 
-        fulfill({code: 200, body: {result: filtereds}})
+            fulfill({code: 200, body: {result: filtereds}})
 
 
         })
@@ -630,9 +642,17 @@ export default class InsightFacade implements IInsightFacade {
     updateTerm(prev:any, cur:any, token:any):any {
         switch (token) {
             case "MAX" :
-                if (prev < cur) return cur;
+                if (prev < cur) {
+                    return cur;
+                } else {
+                    return prev;
+                }
             case "MIN" :
-                if (prev > cur) return cur;
+                if (prev > cur) {
+                    return cur;
+                } else {
+                    return prev;
+                }
             case "AVG" :
                 return prev + cur
             case "COUNT" :
@@ -701,6 +721,7 @@ export default class InsightFacade implements IInsightFacade {
         if ((!Array.isArray(colItems)) || colItems.length === 0) return false
 
 
+        let newKeys:any = [];
         if (!keys.includes("TRANSFORMATIONS")) {
             for (let i of colItems) {
                 if (!that.isKey1(i)) {
@@ -720,7 +741,7 @@ export default class InsightFacade implements IInsightFacade {
 
             let applyTerms:any =[]  // ["rooms_seats"]
             let applyKeys:any = [] //  ["MAX"]
-            let newKeys:any = [] // ["maxSeats"]
+             // ["maxSeats"]
             for (let i in apply) {
                 newKeys.push(Object.keys(apply[i])[0])
                 let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
@@ -931,6 +952,8 @@ export default class InsightFacade implements IInsightFacade {
         if ((!Array.isArray(colItems)) || colItems.length === 0) return false
 
 
+        let newKeys:any = []
+
         if (!keys.includes("TRANSFORMATIONS")) {
             for (let i of colItems) {
                 if (!that.isKey2(i)) {
@@ -950,7 +973,7 @@ export default class InsightFacade implements IInsightFacade {
 
             let applyTerms:any =[]  // ["rooms_seats"]
             let applyKeys:any = [] //  ["MAX"]
-            let newKeys:any = [] // ["maxSeats"]
+            // let newKeys:any = [] // ["maxSeats"]
             for (let i in apply) {
                 newKeys.push(Object.keys(apply[i])[0])
                 let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
@@ -989,7 +1012,7 @@ export default class InsightFacade implements IInsightFacade {
         if (conds.includes("ORDER")) {
             let order = obj2["ORDER"]
             if (typeof order === "string") {
-                if (!that.isKey2(order)) return false
+                if (!that.isKey2(order) && !newKeys.includes(order)) return false
                 if (!colItems.includes(order)) return false
             } else { // multiple fields
                 let orderKeys = Object.keys(order)
@@ -999,7 +1022,7 @@ export default class InsightFacade implements IInsightFacade {
                 }
                 let fields = order["keys"]
                 for (let i in fields) {
-                    if (!that.isKey2(fields[i])) return false
+                    if (!that.isKey2(fields[i]) && !newKeys.includes(fields[i])) return false
                     if (!colItems.includes(fields[i])) return false
                 }
             }
