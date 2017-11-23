@@ -107,7 +107,7 @@ describe("InsightFacadeSpec", function () {
     //****************
     // add new test of mismatch id and dataset
     it('Test for an misatach add data-course.', function () {
-        return insightFacade.addDataset("rooms-", content).then(function (response: InsightResponse) {
+        return insightFacade.addDataset("rooms", content).then(function (response: InsightResponse) {
             expect.fail();
         }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(400);

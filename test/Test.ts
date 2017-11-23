@@ -1314,6 +1314,53 @@ describe("Test", function() {
 
 
 
+    it("Rtest3", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "OR":[{
+                        "AND":[{"NOT": {"NOT":{
+                            "NOT": {"OR": [{"GT":{
+                                "courses_year":1900
+                            }}, {"AND": [{"NOT": {"NOT": {"NOT": {"LT": {"courses_avg":0}}}}}]}]}}}}, {"OR":[{"IS":{
+                            "courses_instructor": "*lis*"
+                        }
+                        },{
+                            "IS":{
+                                "courses_dept":"cpsc"
+                            }
+                        }
+
+                        ]}
+                        ]},{"EQ":{
+                        "courses_avg":98
+
+                    }}]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_instructor",
+                        "courses_year",
+                        "courses_avg"
+                    ],
+                    "ORDER":"courses_avg"
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                result: [{
+                    "courses_instructor": "maillard, keith", "courses_year":2013, "courses_avg":98
+                }, {
+                    "courses_instructor": "grady, albert wayne", "courses_year":2013, "courses_avg":98
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
     it("RtestForUCLL", function() {
         return IF.performQuery({
                 "WHERE": {
