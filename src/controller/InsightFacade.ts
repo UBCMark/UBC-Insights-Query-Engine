@@ -421,7 +421,6 @@ export default class InsightFacade implements IInsightFacade {
 
     }
 
-
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
@@ -488,45 +487,48 @@ export default class InsightFacade implements IInsightFacade {
             }
             //
             let tresult:any = [];
-            // if (Object.keys(query).includes("TRANSFORMATIONS")) {
-            //     let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
-            //     let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
-            //
-            //     let applyTerms:any =[]  // ["rooms_seats"]
-            //     let applyKeys:any = [] //  ["MAX"]
-            //     let newKeys:any = [] // ["maxSeats"]
-            //     for (let i in apply) {
-            //         newKeys.push(Object.keys(apply[i])[0])
-            //         let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
-            //         applyKeys.push(Object.keys(applyEach)[0])
-            //         applyTerms.push(applyEach[Object.keys(applyEach)[0]])
-            //     }
-            //
-            //     let allCols = options["COLUMNS"]
-            //     // let groupBy:any = []
-            //     // for (let i in allCols) {
-            //     //     if (that.isKey1(allCols[i]) || that.isKey2(allCols[i]) || ) {
-            //     //         groupBy.push(allCols[i])
-            //     //     }
-            //     // }
-            //     //let needPush:boolean = true
-            //     let r = result.reduce(function (res, obj) {
-            //         if (that.needPush(res, obj, group) === -1) {
-            //             if (apply.length > 0) {
-            //                 obj = that.transform(obj, apply,applyKeys,applyTerms)
-            //             }
-            //             res.push(obj)
-            //         } else {
-            //             if (apply.length > 0) {
-            //                 let targetIndex = that.needPush(res, obj, group)
-            //                 res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
-            //             }
-            //         }
-            //         return res
-            //     }, [])
-            //
-            //     tresult = r
-            // }
+            if (Object.keys(query).includes("TRANSFORMATIONS")) {
+                let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+                let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
+
+                let applyTerms:any =[]  // ["rooms_seats"]
+                let applyKeys:any = [] //  ["MAX"]
+                let newKeys:any = [] // ["maxSeats"]
+                for (let i in apply) {
+                    console.log("foreach apply " + i);
+                    newKeys.push(Object.keys(apply[i])[0])
+                    let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+                    applyKeys.push(Object.keys(applyEach)[0])
+                    applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+                }
+
+                let allCols = options["COLUMNS"]
+                // let groupBy:any = []
+                // for (let i in allCols) {
+                //     if (that.isKey1(allCols[i]) || that.isKey2(allCols[i]) || ) {
+                //         groupBy.push(allCols[i])
+                //     }
+                // }
+                //let needPush:boolean = true
+                let r = result.reduce(function (res, obj) {
+                    if (that.needPush(res, obj, group) === -1) {
+                        if (apply.length > 0) {
+                            console.log("Init new rowwwwwwww!!!!!!!!!!!!!!");
+                            obj = that.transform(obj, apply,applyKeys,applyTerms)
+                        }
+                        res.push(obj)
+                    } else {
+                        if (apply.length > 0) {
+                            console.log("Accumulate new rowwwwwwww!!!!!!!!!!!!!!");
+                            let targetIndex = that.needPush(res, obj, group)
+                            res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
+                        }
+                    }
+                    return res
+                }, [])
+
+                tresult = r
+            }
 
             let filtereds: any[] = []
             const allowed = options["COLUMNS"]
@@ -601,6 +603,7 @@ export default class InsightFacade implements IInsightFacade {
         // if apply, change name and initialize
         let that = this
         for (let i in apply) {
+            console.log("transform each apply" + i);
             let newName = Object.keys(apply[i])[0]
             let oldName = applyTerms[i]
             let token = applyKeys[i]
@@ -622,6 +625,7 @@ export default class InsightFacade implements IInsightFacade {
             case "COUNT" :
                 return 1;
             case "SUM" :
+                console.log("init sum!!!!!!!!!!!!!!!");
                 return obj[oldName];
         }
     }
@@ -630,6 +634,7 @@ export default class InsightFacade implements IInsightFacade {
         // update the specified field
         let that = this
         for (let i in apply) {
+            console.log("update each apply" + i);
             let newName = Object.keys(apply[i])[0]
             let oldName = applyTerms[i]
             let token = applyKeys[i]
@@ -658,6 +663,7 @@ export default class InsightFacade implements IInsightFacade {
             case "COUNT" :
                 return prev + 1
             case "SUM" :
+                console.log("123");
                 return prev + cur
         }
     }
@@ -666,6 +672,7 @@ export default class InsightFacade implements IInsightFacade {
     needPush(res:any, obj:any,groupBy:any):any {
         let that = this
         for (let i in res) {
+            console.log("each res" + i);
             if (that.containAll(res[i], obj, groupBy)) {
                 return i
             }
@@ -675,6 +682,7 @@ export default class InsightFacade implements IInsightFacade {
 
     containAll(row:any, obj:any,groupBy:any): boolean{
         for (let col in groupBy) {
+            console.log("each groupby" + col);
             let keys = Object.keys(row)
             let values: any = []
             for (let i in keys) {
