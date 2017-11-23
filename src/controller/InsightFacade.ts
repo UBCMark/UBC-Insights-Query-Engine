@@ -40,7 +40,8 @@ let count = 0;
 let validBuildings:any = []
 let groomsInfoList:any[] = [];
 var gbulidings:any = {}
-//var pArr:any = []
+
+
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -69,12 +70,14 @@ export default class InsightFacade implements IInsightFacade {
     htmlBuildInfoParse(html:any, hid:string):Promise<any>{
 
         return new Promise(function (fullfil,reject) {
-            let retInsight:InsightResponse={
-                code:null,
-                body:{}
-            };
-            let that = this;
-            var htmlResult = parse5.parse(html);
+
+        let retInsight:InsightResponse={
+            code:null,
+            body:{}
+        };
+        let that = this;
+        var htmlResult = parse5.parse(html);
+
             let newObj: any = {};
             let flag = htmlResult.childNodes[6].childNodes[3].childNodes[31].childNodes[10].childNodes[1];
             if (!isUndefined(flag)) {
@@ -107,6 +110,7 @@ export default class InsightFacade implements IInsightFacade {
                 let rawData = '';
                 res.on('data', (chunk) => { rawData += chunk; });
                 res.on('end', () => {
+
                     // try {
                     let parsedData = JSON.parse(rawData);
                     newObj[hid + "_lat"] = parsedData["lat"];
@@ -155,16 +159,18 @@ export default class InsightFacade implements IInsightFacade {
                     //     reject(e)
                     //     console.error(e.message);
                     //   }
+
                 });
             });
 
         })
-
     }
+
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
         let that = this;
         // return new Promise(function (fulfill, reject) {
+
 
         let insight: InsightResponse = {
             code: null,
@@ -181,19 +187,10 @@ export default class InsightFacade implements IInsightFacade {
 
         }
 
-        // if(content===null){
-        //     return new Promise(function (fullfill, reject){
-        //         insight.code = 400;
-        //         insight.body = {"error": "not a course or room"};
-        //         return reject(insight);
-        //     })
-        // }
-
-
+        
         if (id === "rooms") {
             return new Promise(function (fulfill, reject) {
 
-                //if (fs.existsSync(id)) {fulfill(insight)}
                 jsz.loadAsync(content, {'base64': true}).then(function (data: any) {
                     let listPromiseFiles: any[] = [];
 
@@ -212,16 +209,7 @@ export default class InsightFacade implements IInsightFacade {
 
                         let indexJS = htmldata[82];
 
-                        //if(that.htmlhelper(indexJS)){
-                            const document = parse5.parse(indexJS);
-                        //}else{
-                        //    return new Promise(function (fullfill, reject){
-                        //        insight.code = 400;
-                        //        insight.body = {"error": "not a course or room"};
-                        //        reject(insight);
-                        //        return;
-                        //    });
-                        //}
+                        const document = parse5.parse(indexJS);
 
                         //const document = parse5.parse(indexJS);
                         let tree = document.childNodes[6].childNodes[3].childNodes[31].childNodes[10]
@@ -249,7 +237,7 @@ export default class InsightFacade implements IInsightFacade {
                         }
                         gbulidings = buildings;
                         validBuildings = Object.keys(buildings);
-                        // console.log(validBuildings);
+
 
 
                         let allBuildingsInfoList: any[] = [];
@@ -294,7 +282,7 @@ export default class InsightFacade implements IInsightFacade {
 
                             }
                             let xyz = JSON.stringify(roomsInfoList);
-                            //if (fs.existsSync(id)) {fulfill(insight)}
+
                            // else {
                                 fs.writeFile(id, xyz, (fileerr: any, filedata: any) => {
 
@@ -368,7 +356,7 @@ export default class InsightFacade implements IInsightFacade {
                                             newObj[id + "_fail"] = c["Fail"];
                                             newObj[id + "_audit"] = c["Audit"];
                                             newObj[id + "_uuid"] = c["id"];
-                                            if(c["Section"]!=='overall') {
+                                            if (c["Section"] !== 'overall') {
                                                 newObj[id + "_year"] = parseInt(c["Year"])
                                             } else {
                                                 newObj[id + "_year"] = 1900
@@ -377,6 +365,7 @@ export default class InsightFacade implements IInsightFacade {
                                             listFiles.push(newObj);
 
                                         }
+
                                     }
                                 }
                             }
@@ -408,34 +397,32 @@ export default class InsightFacade implements IInsightFacade {
                                 insight.code = 400;
                                 insight.body = {"error": "can't write the content to disk"};
                                 reject(insight);
+
                             }
 
                             fulfill(insight);
                             return;
                         });
-
-                    }).catch(function (perr: any) {
+                                }).catch(function (perr: any) {
                         insight.code = 400;
                         insight.body = {"error": "can't write the content to disk"};
                         reject(insight);
                         return;
                     });
 
-                }).catch(function (e: any) {
-                    insight.code = 400;
-                    insight.body = {"error": "can't write the content to disk"};
-                    reject(insight);
-                    return;
-                });
+                    }).catch(function (perr: any) {
+                        insight.code = 400;
+                        insight.body = {"error": "can't write the content to disk"};
+                        reject(insight);
+                        return;
 
-            })
-        }
+            });
+        })
 
     }
 
 
-
-
+    }
 
     removeDataset(id: string): Promise<InsightResponse> {
 
@@ -453,7 +440,9 @@ export default class InsightFacade implements IInsightFacade {
             if(fs.existsSync(id)) {
                 fs.unlinkSync(id);
                 retInsight.code = 204;
-                delete dataset[id];
+
+                delete dataset[id]
+
                 fulfill(retInsight);
             }else{
                 retInsight.code = 404;
@@ -476,18 +465,19 @@ export default class InsightFacade implements IInsightFacade {
 
             // Query OK, decide which dataset to perform query on
 
+            // try {
+            //let dataset: any = {};
             let id = that.getID(query)
 
             let result: any[] = []
             try {
-                if (!Object.keys(dataset).includes(id)) {
+                // if (!Object.keys(dataset).includes(id) || dataset[id].length === 0) {
                     dataset[id] = JSON.parse(fs.readFileSync(id))
-                }
+               // }
 
             } catch (err) {
                 reject({code: 424, body: {"error": "missing dataset"}})
             }
-
 
             let where = query["WHERE"]
             let options = query["OPTIONS"]
@@ -496,51 +486,207 @@ export default class InsightFacade implements IInsightFacade {
                     result.push(data)
                 }
             }
-            let filtereds: any[] = []
-            let keysForOpt = Object.keys(options)
-            const allowed = options["COLUMNS"]
+            //
+            let tresult:any = [];
+            if (Object.keys(query).includes("TRANSFORMATIONS")) {
+                let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+                let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
 
-            for (let raw of result) {
-                let temp: any = {}
-                for (let field of allowed) {
-                    temp[field] = raw[field]
+                let applyTerms:any =[]  // ["rooms_seats"]
+                let applyKeys:any = [] //  ["MAX"]
+                let newKeys:any = [] // ["maxSeats"]
+                for (let i in apply) {
+                    newKeys.push(Object.keys(apply[i])[0])
+                    let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+                    applyKeys.push(Object.keys(applyEach)[0])
+                    applyTerms.push(applyEach[Object.keys(applyEach)[0]])
                 }
-                filtereds.push(temp)
+
+                let allCols = options["COLUMNS"]
+                // let groupBy:any = []
+                // for (let i in allCols) {
+                //     if (that.isKey1(allCols[i]) || that.isKey2(allCols[i]) || ) {
+                //         groupBy.push(allCols[i])
+                //     }
+                // }
+                //let needPush:boolean = true
+                let r = result.reduce(function (res, obj) {
+                    if (that.needPush(res, obj, group) === -1) {
+                        if (apply.length > 0) {
+                            obj = that.transform(obj, apply,applyKeys,applyTerms)
+                        }
+                        res.push(obj)
+                    } else {
+                        if (apply.length > 0) {
+                            let targetIndex = that.needPush(res, obj, group)
+                            res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
+                        }
+                    }
+                    return res
+                }, [])
+
+                tresult = r
             }
 
-            //const allowed = options["COLUMNS"]
-            // for (let raw of result) {
-            //     const filtered = Object.keys(raw)
-            //         .filter(key => allowed.includes(key))
-            //         .reduce((obj, key) => {
-            //             (<any>obj)[key] = (<any>raw)[key];
-            //             return obj;
-            //         }, {});
-            //     filtereds.push(filtered)
-            // }
+            let filtereds: any[] = []
+            const allowed = options["COLUMNS"]
+
+            if (tresult.length === 0) { //
+                for (let raw of result) {
+                    let temp: any = {}
+                    for (let field of allowed) {
+                        temp[field] = raw[field]
+                    }
+                    filtereds.push(temp)
+                }
+            } else {
+                for (let raw of tresult) {
+                    let temp: any = {}
+                    for (let field of allowed) {
+                        temp[field] = raw[field]
+                    }
+                    filtereds.push(temp)}
+            }
+
+
+            let keysForOpt = Object.keys(options)
+
+
             let sortOn =''
             if (keysForOpt.includes("ORDER")) {
                 let sortOn = options["ORDER"] // string
+                if (typeof sortOn === "string") {
+                    filtereds.sort(function (a, b) {
+                        if (a[sortOn] < b[sortOn])
+                            return -1
+                        if (a[sortOn] > b[sortOn])
+                            return 1
+                        return 0
+                    })
+                } else {
+                    let dir = sortOn["dir"]
+                    let keysToSort = sortOn["keys"]
+                    filtereds.sort(function (a, b) {
+                        if (dir === 'UP') {
+                            for (let i in keysToSort) {
+                                if (a[keysToSort[i]] < b[keysToSort[i]])
+                                    return -1
+                                if (a[keysToSort[i]] > b[keysToSort[i]])
+                                    return 1
+                            }
+                            return 0
+                        }else if (dir === 'DOWN') {
+                            for (let i in keysToSort) {
+                                if (a[keysToSort[i]] > b[keysToSort[i]])
+                                    return -1
+                                if (a[keysToSort[i]] < b[keysToSort[i]])
+                                    return 1
+                            }
+                            return 0
+                        }
+                    })
 
-                filtereds.sort(function (a, b) {
-                    if (a[sortOn] < b[sortOn])
-                        return -1
-                    if ( a[sortOn] > b[sortOn])
-                        return 1
-                    return 0
-
-                });
-
+                }
             }
 
             fulfill({code: 200, body: {result: filtereds}})
-            // } catch (err){
-            //     console.log("shouldn't have been here")
-            // }
+
 
         })
 
     }
+
+
+    transform(obj:any, apply: any, applyKeys:any, applyTerms:any): any {
+        // if apply, change name and initialize
+        let that = this
+        for (let i in apply) {
+            let newName = Object.keys(apply[i])[0]
+            let oldName = applyTerms[i]
+            let token = applyKeys[i]
+
+            obj[newName] = that.initializeValue(obj, oldName, token)
+            delete obj[oldName]
+        }
+        return obj
+    }
+
+    initializeValue(obj: any, oldName:any, token:any):any {
+        switch (token) {
+            case "MAX" :
+                return obj[oldName];
+            case "MIN" :
+                return obj[oldName];
+            case "AVG" :
+                return obj[oldName];
+            case "COUNT" :
+                return 1;
+            case "SUM" :
+                return obj[oldName];
+        }
+    }
+
+    updateRow(obj:any, row:any, apply:any, applyKeys:any, applyTerms:any):any {
+        // update the specified field
+        let that = this
+        for (let i in apply) {
+            let newName = Object.keys(apply[i])[0]
+            let oldName = applyTerms[i]
+            let token = applyKeys[i]
+
+            row[newName] = that.updateTerm(row[newName], obj[oldName], token)
+        }
+        return row
+    }
+
+    updateTerm(prev:any, cur:any, token:any):any {
+        switch (token) {
+            case "MAX" :
+                if (prev < cur) {
+                    return cur;
+                } else {
+                    return prev;
+                }
+            case "MIN" :
+                if (prev > cur) {
+                    return cur;
+                } else {
+                    return prev;
+                }
+            case "AVG" :
+                return prev + cur
+            case "COUNT" :
+                return prev + 1
+            case "SUM" :
+                return prev + cur
+        }
+    }
+
+
+    needPush(res:any, obj:any,groupBy:any):any {
+        let that = this
+        for (let i in res) {
+            if (that.containAll(res[i], obj, groupBy)) {
+                return i
+            }
+        }
+        return -1; // need push
+    }
+
+    containAll(row:any, obj:any,groupBy:any): boolean{
+        for (let col in groupBy) {
+            let keys = Object.keys(row)
+            let values: any = []
+            for (let i in keys) {
+                values.push(row[keys[i]])
+            }
+            if (!values.includes(obj[groupBy[col]])) {
+                return false
+            }
+        }
+        return true
+    }
+
 
     getID(query: any): string {
         let that = this
@@ -549,11 +695,19 @@ export default class InsightFacade implements IInsightFacade {
         return ""
     }
 
+
     checkValidity1(query: any): boolean {
         let that = this;
         if (query === null || query === {}) return false;
         let keys = Object.keys(query)
-        if (keys.length !== 2 || (!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+        if (keys.length < 2 || keys.length > 3) return false
+        if (keys.length === 2) {
+            if ((!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+        }
+        if (keys.length === 3) {
+            if ((!keys.includes("WHERE")) || (!keys.includes("OPTIONS")) || (!keys.includes("TRANSFORMATIONS"))) return false;
+        }
+
 
 
         let obj1 = query["WHERE"]
@@ -565,23 +719,94 @@ export default class InsightFacade implements IInsightFacade {
         let colItems = obj2["COLUMNS"]
 
         if ((!Array.isArray(colItems)) || colItems.length === 0) return false
-        for (let i of colItems) {
-            if (!that.isKey1(i)) {
-                return false
+
+
+        let newKeys:any = [];
+        if (!keys.includes("TRANSFORMATIONS")) {
+            for (let i of colItems) {
+                if (!that.isKey1(i)) {
+                    return false
+                }
+            }
+        } else {
+            let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+            let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
+
+            for (let i of group) {
+                if (!that.isKey1(i)) {
+                    return false
+                }
+            }
+            // group terms valid
+
+            let applyTerms:any =[]  // ["rooms_seats"]
+            let applyKeys:any = [] //  ["MAX"]
+             // ["maxSeats"]
+            for (let i in apply) {
+                newKeys.push(Object.keys(apply[i])[0])
+                let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+                applyKeys.push(Object.keys(applyEach)[0])
+                applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+            }
+
+            for (let i of applyKeys) {
+                if (!that.isToken(i)) {
+                    return false
+                }
+            }
+
+            for (let i of applyTerms) {
+                if (applyKeys[i] === "COUNT") {
+                    if (!that.isKey1(i)) {
+                        return false
+                    }
+                } else {
+                    if (!that.ismKey1(i)) {
+                        return false
+                    }
+                }
+            }
+            //group, apply are all valid keys
+
+            // make sure colItems is from group or apply
+            for (let i of colItems) {
+                if (!group.includes(i) && !newKeys.includes(i)) {
+                    return false
+                }
             }
         }
+
+
         if (conds.includes("ORDER")) {
             let order = obj2["ORDER"]
-            if (!that.isKey1(order)) return false
-            if (!colItems.includes(order)) return false
-        }
 
-        // now OPTIONS is all good
+            if (typeof order === "string") {
+                if (!that.isKey1(order)) return false
+                if (!colItems.includes(order)) return false
+            } else { // multiple fields
+                let orderKeys = Object.keys(order)
+                if (orderKeys.length !== 2 || orderKeys[0] !== "dir" || (order["dir"] !== "UP" && order["dir"] !== "DOWN")
+                    ||orderKeys[1] !== "keys") {
+                    return false
+                }
+                let fields = order["keys"]
+                for (let i in fields) {
+                    if (!that.isKey1(fields[i])) return false
+                    if (!colItems.includes(fields[i])) return false
+                }
+            }
+        }
+        // now OPTIONS is all OK
         if (!that.isValidFilter1(obj1)) return false;
 
         return true
     }
 
+
+    isToken(t:any): boolean {
+        if (typeof t !== 'string') return false
+        return (t === 'MAX')||(t === 'MIN')||(t === 'AVG')||(t === 'SUM')||(t === 'COUNT')
+    }
 
     isKey1(item: any): boolean {
         let that = this;
@@ -603,12 +828,15 @@ export default class InsightFacade implements IInsightFacade {
         if (!(obj instanceof Object)) {
             return false;
         }
-        if (Object.keys(obj).length != 1) return false
+        if (Object.keys(obj).length === 0) return true
+        if (Object.keys(obj).length > 1) return false
         let key = Object.keys(obj)[0]
 
         if (key === "AND" || key === "OR") {
             let objInside = obj[key]
+
             if ((!Array.isArray(objInside)) || objInside.length ===0) return false
+
             for (let i of objInside) {
                 if (!this.isValidFilter1(i)) return false
             }
@@ -636,6 +864,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     parser(filter: any, data: any) : boolean {
+        if (Object.keys(filter).length === 0) return true
         let key = Object.keys(filter)[0]
         let obj = filter[key]   // may be object or array
 
@@ -667,7 +896,7 @@ export default class InsightFacade implements IInsightFacade {
             if (val[0] === "*" && val[val.length - 1] !== "*") {
                 let subString = val.substring(1,val.length)
                 if (data[field].length < subString.length) return false
-                return data[field].indexOf(subString) === data[field].length - subString.length
+                return data[field].indexOf(subString, data[field].length - subString.length) !== -1;
             }
             if (val[0] !== "*" && val[val.length - 1] === "*") {
                 let subString = val.substring(0,val.length-1)
@@ -701,7 +930,15 @@ export default class InsightFacade implements IInsightFacade {
 
         if (query === null || query === {}) return false;
         let keys = Object.keys(query)
-        if (keys.length !== 2 || (!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+
+        if (keys.length < 2 || keys.length > 3) return false
+        if (keys.length === 2) {
+            if ((!keys.includes("WHERE")) || (!keys.includes("OPTIONS"))) return false;
+        }
+        if (keys.length === 3) {
+            if ((!keys.includes("WHERE")) || (!keys.includes("OPTIONS")) || (!keys.includes("TRANSFORMATIONS"))) return false;
+        }
+
 
 
         let obj1 = query["WHERE"]
@@ -713,15 +950,83 @@ export default class InsightFacade implements IInsightFacade {
         let colItems = obj2["COLUMNS"]
 
         if ((!Array.isArray(colItems)) || colItems.length === 0) return false
-        for (let i of colItems) {
-            if (!that.isKey2(i)) {
-                return false
+
+
+        let newKeys:any = []
+
+        if (!keys.includes("TRANSFORMATIONS")) {
+            for (let i of colItems) {
+                if (!that.isKey2(i)) {
+                    return false
+                }
+            }
+        } else {
+            let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
+            let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
+
+            for (let i of group) {
+                if (!that.isKey2(i)) {
+                    return false
+                }
+            }
+            // group terms valid
+
+            let applyTerms:any =[]  // ["rooms_seats"]
+            let applyKeys:any = [] //  ["MAX"]
+            // let newKeys:any = [] // ["maxSeats"]
+            for (let i in apply) {
+                newKeys.push(Object.keys(apply[i])[0])
+                let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
+                applyKeys.push(Object.keys(applyEach)[0])
+                applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+            }
+
+            for (let i of applyKeys) {
+                if (!that.isToken(i)) {
+                    return false
+                }
+            }
+
+            for (let i of applyTerms) {
+                if (applyKeys[i] === "COUNT") {
+                    if (!that.isKey2(i)) {
+                        return false
+                    }
+                } else {
+                    if (!that.ismKey2(i)) {
+                        return false
+                    }
+                }
+            }
+            //group, apply are all valid keys
+
+            // make sure colItems is from group or apply
+            for (let i of colItems) {
+                if (!group.includes(i) && !newKeys.includes(i)) {
+                    return false
+                }
             }
         }
+
+
         if (conds.includes("ORDER")) {
             let order = obj2["ORDER"]
-            if (!that.isKey2(order)) return false
-            if (!colItems.includes(order)) return false
+            if (typeof order === "string") {
+                if (!that.isKey2(order) && !newKeys.includes(order)) return false
+                if (!colItems.includes(order)) return false
+            } else { // multiple fields
+                let orderKeys = Object.keys(order)
+                if (orderKeys.length !== 2 || orderKeys[0] !== "dir" || (order["dir"] !== "UP" && order["dir"] !== "DOWN")
+                    ||orderKeys[1] !== "keys") {
+                    return false
+                }
+                let fields = order["keys"]
+                for (let i in fields) {
+                    if (!that.isKey2(fields[i]) && !newKeys.includes(fields[i])) return false
+                    if (!colItems.includes(fields[i])) return false
+                }
+            }
+
         }
 
         // now OPTIONS is all good
@@ -751,12 +1056,17 @@ export default class InsightFacade implements IInsightFacade {
         if (!(obj instanceof Object)) {
             return false;
         }
-        if (Object.keys(obj).length != 1) return false
+
+        if (Object.keys(obj).length === 0) return true
+        if (Object.keys(obj).length > 1) return false
+
         let key = Object.keys(obj)[0]
 
         if (key === "AND" || key === "OR") {
             let objInside = obj[key]
+
             if ((!Array.isArray(objInside)) || objInside.length ===0) return false
+
             for (let i of objInside) {
                 if (!this.isValidFilter2(i)) return false
             }
