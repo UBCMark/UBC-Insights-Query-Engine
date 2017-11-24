@@ -609,7 +609,7 @@ export default class InsightFacade implements IInsightFacade {
             let token = applyKeys[i]
 
             obj[newName] = that.initializeValue(obj, oldName, token)
-            delete obj[oldName]
+            //delete obj[oldName]
         }
         return obj
     }
@@ -639,12 +639,12 @@ export default class InsightFacade implements IInsightFacade {
             let oldName = applyTerms[i]
             let token = applyKeys[i]
 
-            row[newName] = that.updateTerm(row[newName], obj[oldName], token)
+            row[newName] = that.updateTerm(row[newName], obj[oldName], token, row[oldName])
         }
         return row
     }
 
-    updateTerm(prev:any, cur:any, token:any):any {
+    updateTerm(prev:any, cur:any, token:any, oldfield:any):any {
         switch (token) {
             case "MAX" :
                 if (prev < cur) {
@@ -661,6 +661,9 @@ export default class InsightFacade implements IInsightFacade {
             case "AVG" :
                 return prev + cur
             case "COUNT" :
+                if ( oldfield === cur ) {
+                    return prev;
+                }
                 return prev + 1
             case "SUM" :
                 console.log("123");
@@ -763,9 +766,9 @@ export default class InsightFacade implements IInsightFacade {
                 }
             }
 
-            for (let i of applyTerms) {
+            for (let i in applyTerms) {
                 if (applyKeys[i] === "COUNT") {
-                    if (!that.isKey1(i)) {
+                    if (!that.isKey1(applyTerms[i])) {
                         return false
                     }
                 } else {
