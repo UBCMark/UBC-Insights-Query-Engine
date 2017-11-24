@@ -421,7 +421,6 @@ export default class InsightFacade implements IInsightFacade {
 
     }
 
-
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
@@ -496,6 +495,7 @@ export default class InsightFacade implements IInsightFacade {
                 let applyKeys:any = [] //  ["MAX"]
                 let newKeys:any = [] // ["maxSeats"]
                 for (let i in apply) {
+                    console.log("foreach apply " + i);
                     newKeys.push(Object.keys(apply[i])[0])
                     let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
                     applyKeys.push(Object.keys(applyEach)[0])
@@ -513,11 +513,13 @@ export default class InsightFacade implements IInsightFacade {
                 let r = result.reduce(function (res, obj) {
                     if (that.needPush(res, obj, group) === -1) {
                         if (apply.length > 0) {
+                            console.log("Init new rowwwwwwww!!!!!!!!!!!!!!");
                             obj = that.transform(obj, apply,applyKeys,applyTerms)
                         }
                         res.push(obj)
                     } else {
                         if (apply.length > 0) {
+                            console.log("Accumulate new rowwwwwwww!!!!!!!!!!!!!!");
                             let targetIndex = that.needPush(res, obj, group)
                             res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
                         }
@@ -601,12 +603,13 @@ export default class InsightFacade implements IInsightFacade {
         // if apply, change name and initialize
         let that = this
         for (let i in apply) {
+            console.log("transform each apply" + i);
             let newName = Object.keys(apply[i])[0]
             let oldName = applyTerms[i]
             let token = applyKeys[i]
 
             obj[newName] = that.initializeValue(obj, oldName, token)
-            delete obj[oldName]
+            //delete obj[oldName]
         }
         return obj
     }
@@ -622,6 +625,7 @@ export default class InsightFacade implements IInsightFacade {
             case "COUNT" :
                 return 1;
             case "SUM" :
+                console.log("init sum!!!!!!!!!!!!!!!");
                 return obj[oldName];
         }
     }
@@ -630,16 +634,17 @@ export default class InsightFacade implements IInsightFacade {
         // update the specified field
         let that = this
         for (let i in apply) {
+            console.log("update each apply" + i);
             let newName = Object.keys(apply[i])[0]
             let oldName = applyTerms[i]
             let token = applyKeys[i]
 
-            row[newName] = that.updateTerm(row[newName], obj[oldName], token)
+            row[newName] = that.updateTerm(row[newName], obj[oldName], token, row[oldName])
         }
         return row
     }
 
-    updateTerm(prev:any, cur:any, token:any):any {
+    updateTerm(prev:any, cur:any, token:any, oldfield:any):any {
         switch (token) {
             case "MAX" :
                 if (prev < cur) {
@@ -656,8 +661,12 @@ export default class InsightFacade implements IInsightFacade {
             case "AVG" :
                 return prev + cur
             case "COUNT" :
+                if ( oldfield === cur ) {
+                    return prev;
+                }
                 return prev + 1
             case "SUM" :
+                console.log("123");
                 return prev + cur
         }
     }
@@ -666,6 +675,7 @@ export default class InsightFacade implements IInsightFacade {
     needPush(res:any, obj:any,groupBy:any):any {
         let that = this
         for (let i in res) {
+            console.log("each res" + i);
             if (that.containAll(res[i], obj, groupBy)) {
                 return i
             }
@@ -675,6 +685,7 @@ export default class InsightFacade implements IInsightFacade {
 
     containAll(row:any, obj:any,groupBy:any): boolean{
         for (let col in groupBy) {
+            console.log("each groupby" + col);
             let keys = Object.keys(row)
             let values: any = []
             for (let i in keys) {
@@ -755,9 +766,9 @@ export default class InsightFacade implements IInsightFacade {
                 }
             }
 
-            for (let i of applyTerms) {
+            for (let i in applyTerms) {
                 if (applyKeys[i] === "COUNT") {
-                    if (!that.isKey1(i)) {
+                    if (!that.isKey1(applyTerms[i])) {
                         return false
                     }
                 } else {

@@ -1731,6 +1731,57 @@ describe("Test", function() {
         })
     });
 
+
+    it("D3testCountTotalSeat", function() {
+        return IF.performQuery(         {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 300
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "totalSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "UP",
+                        "keys": ["totalSeats"]
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "totalSeats": {
+                            "COUNT": "rooms_seats"
+                        }
+                    }]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "OSBO","totalSeats":"1"
+                }, {
+                    "rooms_shortname": "LSC","totalSeats":"1"
+                }, {
+                    "rooms_shortname": "HEBB","totalSeats":"1"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
     it("D3testSortTwoKeys2", function() {
         return IF.performQuery(         {
                 "WHERE": {
@@ -1780,6 +1831,8 @@ describe("Test", function() {
             expect.fail();
         })
     });
+
+
 //
 //     // **** test Group without Apply
 //
