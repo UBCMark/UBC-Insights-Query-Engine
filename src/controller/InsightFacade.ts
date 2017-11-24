@@ -510,18 +510,19 @@ export default class InsightFacade implements IInsightFacade {
                 //     }
                 // }
                 //let needPush:boolean = true
+                let occurrences:any = []
                 let r = result.reduce(function (res, obj) {
                     if (that.needPush(res, obj, group) === -1) {
                         if (apply.length > 0) {
                             console.log("Init new rowwwwwwww!!!!!!!!!!!!!!");
-                            obj = that.transform(obj, apply,applyKeys,applyTerms)
+                            obj = that.transform(obj, apply,applyKeys,applyTerms, occurrences)
                         }
                         res.push(obj)
                     } else {
                         if (apply.length > 0) {
                             console.log("Accumulate new rowwwwwwww!!!!!!!!!!!!!!");
                             let targetIndex = that.needPush(res, obj, group)
-                            res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms)
+                            res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms, occurrences)
                         }
                     }
                     return res
@@ -599,7 +600,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
 
-    transform(obj:any, apply: any, applyKeys:any, applyTerms:any): any {
+    transform(obj:any, apply: any, applyKeys:any, applyTerms:any, occurrences: any): any {
         // if apply, change name and initialize
         let that = this
         for (let i in apply) {
@@ -607,6 +608,9 @@ export default class InsightFacade implements IInsightFacade {
             let newName = Object.keys(apply[i])[0]
             let oldName = applyTerms[i]
             let token = applyKeys[i]
+            if (token === "COUNT") {
+                occurrences.push(obj[oldName])
+            }
 
             obj[newName] = that.initializeValue(obj, oldName, token)
             //delete obj[oldName]
@@ -630,7 +634,7 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    updateRow(obj:any, row:any, apply:any, applyKeys:any, applyTerms:any):any {
+    updateRow(obj:any, row:any, apply:any, applyKeys:any, applyTerms:any, occurrences:any):any {
         // update the specified field
         let that = this
         for (let i in apply) {
@@ -639,12 +643,12 @@ export default class InsightFacade implements IInsightFacade {
             let oldName = applyTerms[i]
             let token = applyKeys[i]
 
-            row[newName] = that.updateTerm(row[newName], obj[oldName], token, row[oldName])
+            row[newName] = that.updateTerm(row[newName], obj[oldName], token, occurrences)
         }
         return row
     }
 
-    updateTerm(prev:any, cur:any, token:any, oldfield:any):any {
+    updateTerm(prev:any, cur:any, token:any, occurrences:any):any {
         switch (token) {
             case "MAX" :
                 if (prev < cur) {
@@ -661,10 +665,12 @@ export default class InsightFacade implements IInsightFacade {
             case "AVG" :
                 return prev + cur
             case "COUNT" :
-                if ( oldfield === cur ) {
+                if (occurrences.includes(cur)) {
                     return prev;
+                } else {
+                    occurrences.push(cur)
+                    return prev + 1
                 }
-                return prev + 1
             case "SUM" :
                 console.log("123");
                 return prev + cur
@@ -772,7 +778,7 @@ export default class InsightFacade implements IInsightFacade {
                         return false
                     }
                 } else {
-                    if (!that.ismKey1(i)) {
+                    if (!that.ismKey1(applyTerms[i])) {
                         return false
                     }
                 }
@@ -802,7 +808,7 @@ export default class InsightFacade implements IInsightFacade {
                 }
                 let fields = order["keys"]
                 for (let i in fields) {
-                    if (!that.isKey1(fields[i])) return false
+                    if (!that.isKey1(fields[i]) && !newKeys.includes(fields[i])) return false
                     if (!colItems.includes(fields[i])) return false
                 }
             }
@@ -998,13 +1004,13 @@ export default class InsightFacade implements IInsightFacade {
                 }
             }
 
-            for (let i of applyTerms) {
+            for (let i in applyTerms) {
                 if (applyKeys[i] === "COUNT") {
-                    if (!that.isKey2(i)) {
+                    if (!that.isKey2(applyTerms[i])) {
                         return false
                     }
                 } else {
-                    if (!that.ismKey2(i)) {
+                    if (!that.ismKey2(applyTerms[i])) {
                         return false
                     }
                 }
