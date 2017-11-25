@@ -1875,6 +1875,7 @@ describe("Test", function() {
         })
     });
 
+
     it( "D3testAvgCount", function() {
         return IF.performQuery(   {
                 "WHERE": {
@@ -2035,6 +2036,180 @@ describe("Test", function() {
             expect.fail();
         })
     })
+
+
+
+    it("D3basciallytestall", function() {
+
+        return IF.performQuery(         {
+
+                "WHERE": {
+
+                    "AND": [{
+
+                        "IS": {
+
+                            "rooms_furniture": "*Tables*"
+
+                        }
+
+                    }, {
+
+                        "GT": {
+
+                            "rooms_seats": 100
+
+                        }
+
+                    }]
+
+                },
+
+                "OPTIONS": {
+
+                    "COLUMNS": ["rooms_shortname", "maxSeats", "avgSeats", "minSeats", "countRoom", "sumSeats"],
+
+                    "ORDER": {
+
+                        "dir": "UP",
+
+                        "keys": ["avgSeats", "minSeats"]
+
+                    }
+
+                },
+
+                "TRANSFORMATIONS": {
+
+                    "GROUP": ["rooms_shortname"],
+
+                    "APPLY": [{
+
+                        "maxSeats": {
+
+                            "MAX": "rooms_seats"
+
+                        }
+
+                    }, {
+
+                        "avgSeats": {
+
+                            "AVG": "rooms_seats"
+
+                        }
+
+                    }, {
+
+                        "minSeats": {
+
+                            "MIN": "rooms_seats"
+
+                        }
+
+                    }, {
+
+                        "countRoom": {
+
+                            "COUNT": "rooms_shortname"
+
+                        }
+
+                    }, {
+
+                        "sumSeats": {
+
+                            "SUM": "rooms_seats"
+
+                        }
+
+                    }]
+
+                }
+
+            }
+
+        ).then(function (result: any) {
+
+            Log.test("successful query!");
+
+            console.log(result.body)
+
+            expect(result.body).to.deep.equal({
+
+                "result": [{
+
+                    "rooms_shortname": "BUCH","maxSeats":"108", "avgSeats": "108", "minSeats": "108", "countRoom": "1", "sumSeats":"216"
+
+                }, {
+
+                    "rooms_shortname": "WOOD","maxSeats":"120", "avgSeats": "120", "minSeats": "120", "countRoom": "1", "sumSeats":"360"
+
+                }, {
+
+                    "rooms_shortname": "MCLD","maxSeats":"136", "avgSeats": "129.5", "minSeats": "123", "countRoom": "1", "sumSeats":"259"
+
+                }, {
+
+                    "rooms_shortname": "IBLC","maxSeats":"154", "avgSeats": "133", "minSeats": "112", "countRoom": "1", "sumSeats":"266"
+
+                }, {
+
+                    "rooms_shortname": "DMP","maxSeats":"160", "avgSeats": "140", "minSeats": "120", "countRoom": "1", "sumSeats":"280"
+
+                }, {
+
+                    "rooms_shortname": "FRDM","maxSeats":"160", "avgSeats": "160", "minSeats": "160", "countRoom": "1", "sumSeats":"160"
+
+                }, {
+
+                    "rooms_shortname": "SWNG","maxSeats":"190", "avgSeats": "188.75", "minSeats": "187", "countRoom": "1", "sumSeats":"755"
+
+                }, {
+
+                    "rooms_shortname": "LSK","maxSeats":"205", "avgSeats": "194", "minSeats": "183", "countRoom": "1", "sumSeats":"388"
+
+                },{
+
+                    "rooms_shortname": "CHBE","maxSeats":"200", "avgSeats": "200", "minSeats": "200", "countRoom": "1", "sumSeats":"200"
+
+                },{
+
+                    "rooms_shortname": "PHRM","maxSeats":"236", "avgSeats": "201.5", "minSeats": "167", "countRoom": "1", "sumSeats":"403"
+
+                },{
+
+                    "rooms_shortname": "ANGU","maxSeats":"260", "avgSeats": "260", "minSeats": "260", "countRoom": "1", "sumSeats":"260"
+
+                },{
+
+                    "rooms_shortname": "LSC","maxSeats":"350", "avgSeats": "275", "minSeats": "125", "countRoom": "1", "sumSeats":"825"
+
+                },{
+
+                    "rooms_shortname": "SRC","maxSeats":"299", "avgSeats": "299", "minSeats": "299", "countRoom": "1", "sumSeats":"897"
+
+                },{
+
+                    "rooms_shortname": "HEBB","maxSeats":"375", "avgSeats": "375", "minSeats": "375", "countRoom": "1", "sumSeats":"375"
+
+                },{
+
+                    "rooms_shortname": "OSBO","maxSeats":"442", "avgSeats": "442", "minSeats": "442", "countRoom": "1", "sumSeats":"442"
+
+                }]
+
+            });
+
+        }).catch(function (err) {
+
+            Log.test('Error: ' + err);
+
+            expect.fail();
+
+        })
+
+    });
 
 // //
 // //
