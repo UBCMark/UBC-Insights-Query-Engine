@@ -709,8 +709,19 @@ export default class InsightFacade implements IInsightFacade {
 
     getID(query: any): string {
         let that = this
-        if (that.isKey1(query["OPTIONS"]["COLUMNS"][0])) return "courses"
-        if (that.isKey2(query["OPTIONS"]["COLUMNS"][0])) return "rooms"
+        if (query["TRANSFORMATIONS"]!==undefined) {
+            console.log("123");
+           if( query["TRANSFORMATIONS"]["GROUP"][0].includes("courses")){
+               return "courses";
+           }
+           if(query["TRANSFORMATIONS"]["GROUP"][0].includes("rooms")){
+               return "rooms";
+           }
+        }else{
+            if (that.isKey1(query["OPTIONS"]["COLUMNS"][0])) return "courses"
+            if (that.isKey2(query["OPTIONS"]["COLUMNS"][0])) return "rooms"
+        }
+
         return ""
     }
 

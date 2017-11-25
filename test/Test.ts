@@ -1920,6 +1920,57 @@ describe("Test", function() {
     });
 
 
+    it("D3testSortTwoKeys2", function() {
+        return IF.performQuery(         {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_number": "*00"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 200
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname","rooms_number"
+                    ],
+                    "ORDER": {
+                        "dir": "UP",
+                        "keys": ["rooms_number","rooms_shortname"]}
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "GEOG","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "HEBB","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "MATH","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "SCRF","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "WESB","rooms_number":"100"
+                }, {
+                    "rooms_shortname": "HENN","rooms_number":"200"
+                }, {
+                    "rooms_shortname": "LSK","rooms_number":"200"
+                }, {
+                    "rooms_shortname": "BIOL","rooms_number":"2000"
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+
 //
 //     // **** test Group without Apply
 //
@@ -2056,6 +2107,73 @@ describe("Test", function() {
         })
     })
 
+
+    it( "testGetID", function() {
+        var result = IF.getID(   {
+                "WHERE": {
+                    "IS": {
+                        "courses_instructor": "*ebas*"
+                    }
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "maxAvg",
+                        "minAvg",
+                        "sumPass",
+                        "countTitle",
+                        "avgAudit"
+                    ],
+                    "ORDER": { "dir": "UP", "keys": [
+                        "maxAvg",
+                        "minAvg",
+                        "sumPass",
+                        "countTitle"
+                    ] }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["courses_dept", "courses_instructor"],
+                    "APPLY": [
+                        { "countTitle": { "COUNT": "courses_title" } },
+                        { "sumPass": { "SUM": "courses_pass"} },
+                        { "maxAvg": { "MAX": "courses_avg"} },
+                        { "minAvg": { "MIN": "courses_avg"} },
+                        { "avgAudit": { "AVG": "courses_audit"} } ]
+                }
+            }
+        )
+            console.log(result)
+            expect(result).equal("courses");
+    })
+
+
+    it( "testGetIDnotransform", function() {
+        var result = IF.getID(   {
+                "WHERE": {
+                    "IS": {
+                        "courses_instructor": "*ebas*"
+                    }
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_dept",
+                        "maxAvg",
+                        "minAvg",
+                        "sumPass",
+                        "countTitle",
+                        "avgAudit"
+                    ],
+                    "ORDER": { "dir": "UP", "keys": [
+                        "maxAvg",
+                        "minAvg",
+                        "sumPass",
+                        "countTitle"
+                    ] }
+                },
+            }
+        )
+        console.log(result)
+        expect(result).equal("courses");
+    })
 // //
 // //
 // //
