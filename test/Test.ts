@@ -1962,6 +1962,7 @@ describe("Test", function() {
         })
     });
 
+
     it( "D3testAvgCount", function() {
         return IF.performQuery(   {
                 "WHERE": {
@@ -2122,6 +2123,9 @@ describe("Test", function() {
             expect.fail();
         })
     })
+
+
+
 
 // //
 // //
