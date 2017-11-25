@@ -14,6 +14,7 @@ const parse5 = require('parse5');
 import * as http from "http";
 import {isUndefined} from "util";
 const querystring = require('querystring');
+let Decimal = require('decimal.js');
 
 
 interface MyObj{
@@ -486,7 +487,7 @@ export default class InsightFacade implements IInsightFacade {
                 }
             }
             //
-            let tresult:any = [];
+            let resultObj:any = {};
             if (Object.keys(query).includes("TRANSFORMATIONS")) {
                 let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
                 let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
@@ -511,30 +512,49 @@ export default class InsightFacade implements IInsightFacade {
                 // }
                 //let needPush:boolean = true
                 let occurrences:any = []
+                let AvgArrayObj:any = {}
+                let SumArrayObj: any = {}
                 let r = result.reduce(function (res, obj) {
-                    if (that.needPush(res, obj, group) === -1) {
+                    let unique = that.concatenate(obj, group);
+                    // AvgArrayObj[unique] = [];
+                    // SumArrayObj[unique] = [];
+                    if (res[unique] === undefined) {
                         if (apply.length > 0) {
                             console.log("Init new rowwwwwwww!!!!!!!!!!!!!!");
-                            obj = that.transform(obj, apply,applyKeys,applyTerms, occurrences)
+                            obj = that.transform(obj, apply,applyKeys,applyTerms, occurrences, AvgArrayObj[unique] = [], SumArrayObj[unique] = [])
                         }
-                        res.push(obj)
+                        res[unique] = obj;
                     } else {
                         if (apply.length > 0) {
-                            console.log("Accumulate new rowwwwwwww!!!!!!!!!!!!!!");
-                            let targetIndex = that.needPush(res, obj, group)
-                            res[targetIndex] = that.updateRow(obj, res[targetIndex], apply, applyKeys, applyTerms, occurrences)
+                            res[unique] = that.updateRow(obj, res[unique], apply, applyKeys, applyTerms, occurrences, AvgArrayObj[unique], SumArrayObj[unique])
                         }
                     }
                     return res
-                }, [])
+                }, {})
+                if (applyKeys.includes("AVG")) {
+                    let i = applyKeys.indexOf("AVG")
+                    let avgField = newKeys[i]
+                    for (let unique in r) {
+                        let avg: number = Number((AvgArrayObj[unique].map((val:any) => <any>new Decimal(val)).reduce((a:any,b:any) => a.plus(b)).toNumber() / AvgArrayObj[unique].length).toFixed(2));
+                        r[unique][avgField] = avg
+                    }
+                }
+                if (applyKeys.includes("SUM")) {
+                    let i = applyKeys.indexOf("SUM")
+                    let sumField = newKeys[i]
+                    for (let unique in r) {
+                        let sum = Number(SumArrayObj[unique].map((val:any) => new Decimal(val)).reduce((a:any,b:any) => a.plus(b)).toNumber().toFixed(2));
+                        r[unique][sumField] = sum
+                    }
+                }
 
-                tresult = r
+                resultObj = r
             }
 
             let filtereds: any[] = []
             const allowed = options["COLUMNS"]
 
-            if (tresult.length === 0) { //
+            if (Object.keys(resultObj).length === 0) {
                 for (let raw of result) {
                     let temp: any = {}
                     for (let field of allowed) {
@@ -543,10 +563,11 @@ export default class InsightFacade implements IInsightFacade {
                     filtereds.push(temp)
                 }
             } else {
-                for (let raw of tresult) {
+                for (let key in resultObj) {
                     let temp: any = {}
                     for (let field of allowed) {
-                        temp[field] = raw[field]
+                        temp[field] = resultObj[key][field]
+
                     }
                     filtereds.push(temp)}
             }
@@ -556,6 +577,7 @@ export default class InsightFacade implements IInsightFacade {
 
 
             let sortOn =''
+
             if (keysForOpt.includes("ORDER")) {
                 let sortOn = options["ORDER"] // string
                 if (typeof sortOn === "string") {
@@ -599,8 +621,15 @@ export default class InsightFacade implements IInsightFacade {
 
     }
 
+    concatenate(obj:any, group:any):any {
+        let result = '';
+        for (let i of group) {
+            result = result + obj[i];
+        }
+        return result;
+    }
 
-    transform(obj:any, apply: any, applyKeys:any, applyTerms:any, occurrences: any): any {
+    transform(obj:any, apply: any, applyKeys:any, applyTerms:any, occurrences: any, AvgArray:any, SumArray:any): any {
         // if apply, change name and initialize
         let that = this
         for (let i in apply) {
@@ -612,43 +641,43 @@ export default class InsightFacade implements IInsightFacade {
                 occurrences.push(obj[oldName])
             }
 
-            obj[newName] = that.initializeValue(obj, oldName, token)
+            obj[newName] = that.initializeValue(obj, oldName, token, AvgArray, SumArray)
             //delete obj[oldName]
         }
         return obj
     }
 
-    initializeValue(obj: any, oldName:any, token:any):any {
+    initializeValue(obj: any, oldName:any, token:any, AvgArray:any, SumArray:any):any {
         switch (token) {
             case "MAX" :
                 return obj[oldName];
             case "MIN" :
                 return obj[oldName];
             case "AVG" :
+                AvgArray.push(obj[oldName]);
                 return obj[oldName];
             case "COUNT" :
                 return 1;
             case "SUM" :
-                console.log("init sum!!!!!!!!!!!!!!!");
+                SumArray.push(obj[oldName]);
                 return obj[oldName];
         }
     }
 
-    updateRow(obj:any, row:any, apply:any, applyKeys:any, applyTerms:any, occurrences:any):any {
+    updateRow(obj:any, row:any, apply:any, applyKeys:any, applyTerms:any, occurrences:any, AvgArray:any, SumArray:any):any {
         // update the specified field
         let that = this
         for (let i in apply) {
-            console.log("update each apply" + i);
             let newName = Object.keys(apply[i])[0]
             let oldName = applyTerms[i]
             let token = applyKeys[i]
 
-            row[newName] = that.updateTerm(row[newName], obj[oldName], token, occurrences)
+            row[newName] = that.updateTerm(row[newName], obj[oldName], token, occurrences, AvgArray, SumArray)
         }
         return row
     }
 
-    updateTerm(prev:any, cur:any, token:any, occurrences:any):any {
+    updateTerm(prev:any, cur:any, token:any, occurrences:any, AvgArray:any, SumArray:any):any {
         switch (token) {
             case "MAX" :
                 if (prev < cur) {
@@ -663,6 +692,7 @@ export default class InsightFacade implements IInsightFacade {
                     return prev;
                 }
             case "AVG" :
+                AvgArray.push(cur);
                 return prev + cur
             case "COUNT" :
                 if (occurrences.includes(cur)) {
@@ -672,37 +702,38 @@ export default class InsightFacade implements IInsightFacade {
                     return prev + 1
                 }
             case "SUM" :
-                console.log("123");
-                return prev + cur
+                SumArray.push(cur);
+                return prev + cur;
         }
     }
 
-
-    needPush(res:any, obj:any,groupBy:any):any {
-        let that = this
-        for (let i in res) {
-            console.log("each res" + i);
-            if (that.containAll(res[i], obj, groupBy)) {
-                return i
-            }
-        }
-        return -1; // need push
-    }
-
-    containAll(row:any, obj:any,groupBy:any): boolean{
-        for (let col in groupBy) {
-            console.log("each groupby" + col);
-            let keys = Object.keys(row)
-            let values: any = []
-            for (let i in keys) {
-                values.push(row[keys[i]])
-            }
-            if (!values.includes(obj[groupBy[col]])) {
-                return false
-            }
-        }
-        return true
-    }
+    //
+    // needPush(res:any, unqiue:any):any {
+    //
+    //     // let that = this
+    //     // for (let i in res) {
+    //     //     console.log("each res" + i);
+    //     //     if (that.containAll(res[i], obj, groupBy)) {
+    //     //         return i
+    //     //     }
+    //     // }
+    //     // return -1; // need push
+    // }
+    //
+    // containAll(row:any, obj:any,groupBy:any): boolean{
+    //     for (let col in groupBy) {
+    //         console.log("each groupby" + col);
+    //         let keys = Object.keys(row)
+    //         let values: any = []
+    //         for (let i in keys) {
+    //             values.push(row[keys[i]])
+    //         }
+    //         if (!values.includes(obj[groupBy[col]])) {
+    //             return false
+    //         }
+    //     }
+    //     return true
+    // }
 
 
     getID(query: any): string {
