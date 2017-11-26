@@ -356,7 +356,7 @@ export default class InsightFacade implements IInsightFacade {
                                             newObj[id + "_pass"] = c["Pass"];
                                             newObj[id + "_fail"] = c["Fail"];
                                             newObj[id + "_audit"] = c["Audit"];
-                                            newObj[id + "_uuid"] = c["id"];
+                                            newObj[id + "_uuid"] = c["id"].toString();
                                             if (c["Section"] !== 'overall') {
                                                 newObj[id + "_year"] = parseInt(c["Year"])
                                             } else {
@@ -457,10 +457,10 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise(function (fulfill, reject) {
             try {
                 if (!that.checkValidity2(query) && !that.checkValidity1(query))  {
-                    reject({code: 400, body: {"error": "invalid query"}});
+                    return reject({code: 400, body: {"error": "invalid query"}});
                 }
             } catch(exception) {
-                reject({code: 400, body: {"error": "invalid query"}});
+                return reject({code: 400, body: {"error": "invalid query"}});
             }
 
             // Query OK, decide which dataset to perform query on
@@ -738,8 +738,19 @@ export default class InsightFacade implements IInsightFacade {
 
     getID(query: any): string {
         let that = this
-        if (that.isKey1(query["OPTIONS"]["COLUMNS"][0])) return "courses"
-        if (that.isKey2(query["OPTIONS"]["COLUMNS"][0])) return "rooms"
+        if (query["TRANSFORMATIONS"]!==undefined) {
+            console.log("123");
+           if( query["TRANSFORMATIONS"]["GROUP"][0].includes("courses")){
+               return "courses";
+           }
+           if(query["TRANSFORMATIONS"]["GROUP"][0].includes("rooms")){
+               return "rooms";
+           }
+        }else{
+            if (that.isKey1(query["OPTIONS"]["COLUMNS"][0])) return "courses"
+            if (that.isKey2(query["OPTIONS"]["COLUMNS"][0])) return "rooms"
+        }
+
         return ""
     }
 
