@@ -1614,6 +1614,59 @@ describe("Test", function() {
         })
     });
 
+    it("D3testSample1", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 300
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "maxSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["maxSeats"]
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "maxSeats": {
+                            "MAX": "rooms_seats"
+                        }
+                    }]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "OSBO",
+                    "maxSeats": 442
+                }, {
+                    "rooms_shortname": "HEBB",
+                    "maxSeats": 375
+                }, {
+                    "rooms_shortname": "LSC",
+                    "maxSeats": 350
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
 
     it("D3testSample2", function() {
         return IF.performQuery(       {
