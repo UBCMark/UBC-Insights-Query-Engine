@@ -457,10 +457,10 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise(function (fulfill, reject) {
             try {
                 if (!that.checkValidity2(query) && !that.checkValidity1(query))  {
-                    reject({code: 400, body: {"error": "invalid query"}});
+                    return reject({code: 400, body: {"error": "invalid query"}});
                 }
             } catch(exception) {
-                reject({code: 400, body: {"error": "invalid query"}});
+                return reject({code: 400, body: {"error": "invalid query"}});
             }
 
             // Query OK, decide which dataset to perform query on
