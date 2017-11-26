@@ -356,7 +356,7 @@ export default class InsightFacade implements IInsightFacade {
                                             newObj[id + "_pass"] = c["Pass"];
                                             newObj[id + "_fail"] = c["Fail"];
                                             newObj[id + "_audit"] = c["Audit"];
-                                            newObj[id + "_uuid"] = c["id"];
+                                            newObj[id + "_uuid"] = c["id"].toString();
                                             if (c["Section"] !== 'overall') {
                                                 newObj[id + "_year"] = parseInt(c["Year"])
                                             } else {

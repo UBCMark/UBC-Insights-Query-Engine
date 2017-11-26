@@ -1056,26 +1056,26 @@ describe("Test", function() {
 //             expect(err.code).to.deep.equal(400)
 //         })
 //     });
-//     it("RsemanticTestWrongkey3", function(){
-//         return IF.performQuery({
-//             "WHERE":{
-//                 "OR": [{"GT":{"rooms_lon":90}},{"IS":{"rooms_address":"adhe"}}]
-//             },
-//             "OPTIONS":{
-//                 "COLUMNS":[
-//                     "rooms_nam",
-//                     "rooms_type"
-//                 ],
-//                 "ORDER":"rooms_name"
-//             }
-//         }).then(function (result: any){
-//             Log.test("empty Col, shouldn't have fulfill")
-//             expect.fail()
-//         }).catch(function (err) {
-//             Log.test("successfully reject (empty Col)")
-//             expect(err.code).to.deep.equal(400)
-//         })
-//     });
+    it("RsemanticTestWrongkey3", function(){
+        return IF.performQuery({
+            "WHERE":{
+                "OR": [{"GT":{"rooms_lon":90}},{"IS":{"rooms_address":"adhe"}}]
+            },
+            "OPTIONS":{
+                "COLUMNS":[
+                    "rooms_nam",
+                    "rooms_type"
+                ],
+                "ORDER":"rooms_name"
+            }
+        }).then(function (result: any){
+            Log.test("empty Col, shouldn't have fulfill")
+            expect.fail()
+        }).catch(function (err) {
+            Log.test("successfully reject (empty Col)")
+            expect(err.code).to.deep.equal(400)
+        })
+    });
 //
 //     it("RsemanticTestWrongType", function(){
 //         return IF.performQuery({
@@ -1492,6 +1492,75 @@ describe("Test", function() {
 // //     // **************************************new query!!
 // //
 //
+//     it.only("selectAll", function() {
+//         return IF.performQuery(   {
+//                 "WHERE": {
+//                 },
+//                 "OPTIONS": {
+//                     "COLUMNS": [
+//                         "courses_dept",
+//                         "courses_id",
+//                         "courses_avg",
+//                         "courses_instructor",
+//                         "courses_title",
+//                         "courses_pass",
+//                         "courses_fail",
+//                         "courses_audit",
+//                         "courses_uuid",
+//                         "courses_year"
+//                     ]
+//                 },
+//             }
+//         ).then(function (result: any) {
+//             Log.test("successful query!");
+//             console.log(result.body);
+//             //expect(result.code).equal(200);
+//             // expect(result.body).to.deep.equal({
+//             //     "result": [{
+//             //         "rooms_shortname": "OSBO",
+//             //         "maxSeats": 442
+//             //     }, {
+//             //         "rooms_shortname": "HEBB",
+//             //         "maxSeats": 375
+//             //     }, {
+//             //         "rooms_shortname": "LSC",
+//             //         "maxSeats": 350
+//             //     }]
+//             // });
+//         }).catch(function (err) {
+//             Log.test('Error: ' + err);
+//             expect.fail();
+//         })
+//     });
+
+    it("invalidQuery", function() {
+        return IF.performQuery(   {
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg",
+                        "courses_instructor",
+                        "courses_title",
+                        "courses_pass",
+                        "courses_fail",
+                        "courses_audit",
+                        "courses_uuid",
+                        "courses_year"
+                    ]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("empty Col, shouldn't have fulfill");
+            expect.fail();
+        }).catch(function (err) {
+            console.log("123");
+            Log.test('Error: ' + err);
+            expect(err.code).to.deep.equal(400);
+            //expect.fail();
+        })
+    });
+
     it("D3testSample1", function() {
         return IF.performQuery(   {
                 "WHERE": {
@@ -1512,7 +1581,7 @@ describe("Test", function() {
                     ],
                     "ORDER": {
                         "dir": "DOWN",
-                        "keys": ["maxSeats"]  // or "keys": "maxSeats"
+                        "keys": ["maxSeats"]
                     }
                 },
                 "TRANSFORMATIONS": {
