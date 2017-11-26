@@ -483,7 +483,7 @@ export default class InsightFacade implements IInsightFacade {
                // }
 
             } catch (err) {
-                reject({code: 424, body: {"error": "missing dataset"}})
+                return reject({code: 424, body: {"error": "missing dataset"}})
             }
 
             let where = query["WHERE"]
@@ -509,6 +509,8 @@ export default class InsightFacade implements IInsightFacade {
                         let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
                         applyKeys.push(Object.keys(applyEach)[0])
                         applyTerms.push(applyEach[Object.keys(applyEach)[0]])
+                    }else{
+                        return reject({code: 400, body: {"error": "invalid because of duplicate define"}})
                     }
                 }
 
