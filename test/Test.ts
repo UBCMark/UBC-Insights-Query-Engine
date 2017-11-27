@@ -1881,7 +1881,7 @@ describe("Test", function() {
     });
 
 
-    it.only("D3testSpecialCharacters&Escape&SWAPORDER", function() {
+    it("D3testSpecialCharacters&Escape&SWAPORDER", function() {
         return IF.performQuery(   {
                 "WHERE": {
                     "AND": [{
@@ -2063,7 +2063,7 @@ describe("Test", function() {
         })
     });
 
-    it.only("D3testSpecialInvalidQuerywithMoreColumn", function() {
+    it("D3testSpecialInvalidQuerywithMoreColumn", function() {
         return IF.performQuery(   {
                 "WHERE": {
                     "AND": [{
@@ -2116,7 +2116,7 @@ describe("Test", function() {
         })
     });
 
-    it.only("D3testNoWhere", function() {
+    it("D3testNoWhere", function() {
         return IF.performQuery(   {
                 "OPTIONS": {
                     "COLUMNS": [
