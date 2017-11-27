@@ -1561,7 +1561,7 @@ describe("Test", function() {
         })
     });
 
-    it("D3testSample1", function() {
+    it.only("D3testSpecialCharacters&Escape", function() {
         return IF.performQuery(   {
                 "WHERE": {
                     "AND": [{
@@ -1570,25 +1570,35 @@ describe("Test", function() {
                         }
                     }, {
                         "GT": {
-                            "rooms_seats": 300
+                            "rooms_seats": 180
                         }
                     }]
                 },
                 "OPTIONS": {
                     "COLUMNS": [
                         "rooms_shortname",
-                        "maxSeats"
+                        "\"THE\"Rock",
+                        "The'?!@#$%^&*()\/nLions\"Den",
+                        "The\"Lions\"Den"
                     ],
                     "ORDER": {
                         "dir": "DOWN",
-                        "keys": ["maxSeats"]
+                        "keys": ["\"THE\"Rock"]
                     }
                 },
                 "TRANSFORMATIONS": {
                     "GROUP": ["rooms_shortname"],
                     "APPLY": [{
-                        "maxSeats": {
-                            "MAX": "rooms_seats"
+                        "\"THE\"Rock": {
+                            "SUM": "rooms_seats"
+                        }
+                    },{
+                        "The'?!@#$%^&*()\/nLions\"Den":{
+                            "COUNT": "rooms_seats"
+                        }
+                    },{
+                        "The\"Lions\"Den":{
+                            "COUNT":"rooms_type"
                         }
                     }]
                 }
@@ -1598,14 +1608,50 @@ describe("Test", function() {
             console.log(result.body)
             expect(result.body).to.deep.equal({
                 "result": [{
-                    "rooms_shortname": "OSBO",
-                    "maxSeats": 442
-                }, {
-                    "rooms_shortname": "HEBB",
-                    "maxSeats": 375
-                }, {
+                    "rooms_shortname": "SRC",
+                    "\"THE\"Rock": 897,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "SWNG",
+                    "\"THE\"Rock": 755,
+                    "The'?!@#$%^&*()\/nLions\"Den": 3,
+                    "The\"Lions\"Den": 1
+                },{
                     "rooms_shortname": "LSC",
-                    "maxSeats": 350
+                    "\"THE\"Rock": 700,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "OSBO",
+                    "\"THE\"Rock": 442,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "LSK",
+                    "\"THE\"Rock": 388,
+                    "The'?!@#$%^&*()\/nLions\"Den": 2,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "HEBB",
+                    "\"THE\"Rock": 375,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "ANGU",
+                    "\"THE\"Rock": 260,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "PHRM",
+                    "\"THE\"Rock": 236,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                }, {
+                    "rooms_shortname": "CHBE",
+                    "\"THE\"Rock": 200,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
                 }]
             });
         }).catch(function (err) {
@@ -2180,6 +2226,8 @@ describe("Test", function() {
             expect.fail();
         })
     });
+
+
 
     it( "D3testAllTokensinCourses", function() {
         return IF.performQuery(   {
