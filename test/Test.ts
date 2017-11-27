@@ -1561,7 +1561,7 @@ describe("Test", function() {
         })
     });
 
-    it("D3testSample1", function() {
+    it("D3testSpecialCharacters&Escape", function() {
         return IF.performQuery(   {
                 "WHERE": {
                     "AND": [{
@@ -1570,25 +1570,35 @@ describe("Test", function() {
                         }
                     }, {
                         "GT": {
-                            "rooms_seats": 300
+                            "rooms_seats": 180
                         }
                     }]
                 },
                 "OPTIONS": {
                     "COLUMNS": [
                         "rooms_shortname",
-                        "maxSeats"
+                        "\"THE\"Rock",
+                        "The'?!@#$%^&*()\/nLions\"Den",
+                        "The\"Lions\"Den"
                     ],
                     "ORDER": {
                         "dir": "DOWN",
-                        "keys": ["maxSeats"]
+                        "keys": ["\"THE\"Rock"]
                     }
                 },
                 "TRANSFORMATIONS": {
                     "GROUP": ["rooms_shortname"],
                     "APPLY": [{
-                        "maxSeats": {
-                            "MAX": "rooms_seats"
+                        "\"THE\"Rock": {
+                            "SUM": "rooms_seats"
+                        }
+                    },{
+                        "The'?!@#$%^&*()\/nLions\"Den":{
+                            "COUNT": "rooms_seats"
+                        }
+                    },{
+                        "The\"Lions\"Den":{
+                            "COUNT":"rooms_type"
                         }
                     }]
                 }
@@ -1596,21 +1606,554 @@ describe("Test", function() {
         ).then(function (result: any) {
             Log.test("successful query!");
             console.log(result.body)
+            console.log(result.code)
+            expect(result.code).eq(200);
             expect(result.body).to.deep.equal({
                 "result": [{
-                    "rooms_shortname": "OSBO",
-                    "maxSeats": 442
-                }, {
-                    "rooms_shortname": "HEBB",
-                    "maxSeats": 375
-                }, {
+                    "rooms_shortname": "SRC",
+                    "\"THE\"Rock": 897,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "SWNG",
+                    "\"THE\"Rock": 755,
+                    "The'?!@#$%^&*()\/nLions\"Den": 3,
+                    "The\"Lions\"Den": 1
+                },{
                     "rooms_shortname": "LSC",
-                    "maxSeats": 350
+                    "\"THE\"Rock": 700,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "OSBO",
+                    "\"THE\"Rock": 442,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "LSK",
+                    "\"THE\"Rock": 388,
+                    "The'?!@#$%^&*()\/nLions\"Den": 2,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "HEBB",
+                    "\"THE\"Rock": 375,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "ANGU",
+                    "\"THE\"Rock": 260,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "PHRM",
+                    "\"THE\"Rock": 236,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                }, {
+                    "rooms_shortname": "CHBE",
+                    "\"THE\"Rock": 200,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
                 }]
             });
         }).catch(function (err) {
             Log.test('Error: ' + err);
             expect.fail();
+        })
+    });
+
+    it("D3testTomacco", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "x",
+                        "y"
+                    ],
+                    "ORDER": {
+                        "dir": "UP",
+                        "keys": ["x","y"]
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "x": {
+                            "SUM": "rooms_lat"
+                        }
+                    },{
+                        "y":{
+                            "SUM": "rooms_lon"
+                        }
+                    }]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            console.log(result.code)
+            expect(result.code).eq(200);
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "CIRS",
+                    "x": 42.26,
+                    "y": -123.25
+                }, {
+                    "rooms_shortname": "AERL",
+                    "x": 49.26,
+                    "y": -123.25
+                },{
+                    "rooms_shortname": "EOSM",
+                    "x": 49.26,
+                    "y": -123.25
+                },{
+                    "rooms_shortname": "FRDM",
+                    "x": 49.27,
+                    "y": -123.25
+                },{
+                    "rooms_shortname": "MATX",
+                    "x": 49.27,
+                    "y": -123.25
+                },{
+                    "rooms_shortname": "AUDX",
+                    "x": 98.53,
+                    "y": -246.51
+                },{
+                    "rooms_shortname": "WESB",
+                    "x": 98.53,
+                    "y": -246.5
+                },{
+                    "rooms_shortname": "MGYM",
+                    "x": 98.53,
+                    "y": -246.49
+                },{
+                    "rooms_shortname": "BRKX",
+                    "x": 98.54,
+                    "y": -246.5
+                },{
+                    "rooms_shortname": "IONA",
+                    "x": 98.54,
+                    "y": -246.5
+                },{
+                    "rooms_shortname": "OSBO",
+                    "x": 147.78,
+                    "y": -369.73
+                },{
+                    "rooms_shortname": "FORW",
+                    "x": 147.79,
+                    "y": -369.76
+                },{
+                    "rooms_shortname": "ESB",
+                    "x": 147.79,
+                    "y": -369.76
+                },{
+                    "rooms_shortname": "CHBE",
+                    "x": 147.79,
+                    "y": -369.74
+                },{
+                    "rooms_shortname": "LSC",
+                    "x": 147.79,
+                    "y": -369.73
+                },{
+                    "rooms_shortname": "SRC",
+                    "x": 147.8,
+                    "y": -369.75
+                },{
+                    "rooms_shortname": "LSK",
+                    "x": 197.06,
+                    "y": -493.02
+                },{
+                    "rooms_shortname": "BIOL",
+                    "x": 197.06,
+                    "y": -493.01
+                },{
+                    "rooms_shortname": "HEBB",
+                    "x": 197.06,
+                    "y": -493.02
+                },{
+                    "rooms_shortname": "UCLL",
+                    "x": 197.07,
+                    "y": -493.03
+                },{
+                    "rooms_shortname": "ANSO",
+                    "x": 197.08,
+                    "y": -493.03
+                },{
+                    "rooms_shortname": "DMP",
+                    "x": 246.31,
+                    "y": -616.24
+                },{
+                    "rooms_shortname": "ALRD",
+                    "x": 246.35,
+                    "y": -616.27
+                },{
+                    "rooms_shortname": "MCLD",
+                    "x": 295.57,
+                    "y": -739.5
+                },{
+                    "rooms_shortname": "FNH",
+                    "x": 295.58,
+                    "y": -739.5
+                },{
+                    "rooms_shortname": "CEME",
+                    "x": 295.58,
+                    "y": -739.49
+                },{
+                    "rooms_shortname": "SPPH",
+                    "x": 295.59,
+                    "y": -739.49
+                },{
+                    "rooms_shortname": "CHEM",
+                    "x": 295.6,
+                    "y": -739.52
+                },{
+                    "rooms_shortname": "HENN",
+                    "x": 295.6,
+                    "y": -739.52
+                },{
+                    "rooms_shortname": "LASR",
+                    "x": 295.61,
+                    "y": -739.53
+                },{
+                    "rooms_shortname": "SOWK",
+                    "x": 344.85,
+                    "y": -862.79
+                },{
+                    "rooms_shortname": "PCOH",
+                    "x": 394.11,
+                    "y": -986.05
+                },{
+                    "rooms_shortname": "GEOG",
+                    "x": 394.13,
+                    "y": -986.05
+                },{
+                    "rooms_shortname": "MATH",
+                    "x": 394.13,
+                    "y": -986.04
+                },{
+                    "rooms_shortname": "FSC",
+                    "x": 492.6,
+                    "y": -1232.49
+                },{
+                    "rooms_shortname": "PHRM",
+                    "x": 541.89,
+                    "y": -1355.68
+                },{
+                    "rooms_shortname": "WOOD",
+                    "x": 788.24,
+                    "y": -1971.95
+                },{
+                    "rooms_shortname": "IBLC",
+                    "x": 886.82,
+                    "y": -2218.64
+                },{
+                    "rooms_shortname": "MCML",
+                    "x": 935.96,
+                    "y": -2341.76
+                },{
+                    "rooms_shortname": "ORCH",
+                    "x": 1034.47,
+                    "y": -2588.24
+                },{
+                    "rooms_shortname": "SWNG",
+                    "x": 1083.78,
+                    "y": -2711.59
+                },{
+                    "rooms_shortname": "SCRF",
+                    "x": 1083.81,
+                    "y": -2711.57
+                },{
+                    "rooms_shortname": "ANGU",
+                    "x": 1379.42,
+                    "y": -3451.1
+                },{
+                    "rooms_shortname": "BUCH",
+                    "x": 3005.36,
+                    "y": -7518.54
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+
+    it.only("D3testSpecialCharacters&Escape&SWAPORDER", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 180
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "\"THE\"Rock",
+                        "The'?!@#$%^&*()\/nLions\"Den",
+                        "The\"Lions\"Den"
+                    ],
+                    "ORDER": {
+                        "keys": ["\"THE\"Rock"],
+                        "dir": "DOWN"
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "\"THE\"Rock": {
+                            "SUM": "rooms_seats"
+                        }
+                    },{
+                        "The'?!@#$%^&*()\/nLions\"Den":{
+                            "COUNT": "rooms_seats"
+                        }
+                    },{
+                        "The\"Lions\"Den":{
+                            "COUNT":"rooms_type"
+                        }
+                    }]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            console.log(result.code)
+            expect(result.code).eq(200);
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "rooms_shortname": "SRC",
+                    "\"THE\"Rock": 897,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "SWNG",
+                    "\"THE\"Rock": 755,
+                    "The'?!@#$%^&*()\/nLions\"Den": 3,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "LSC",
+                    "\"THE\"Rock": 700,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "OSBO",
+                    "\"THE\"Rock": 442,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "LSK",
+                    "\"THE\"Rock": 388,
+                    "The'?!@#$%^&*()\/nLions\"Den": 2,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "HEBB",
+                    "\"THE\"Rock": 375,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "ANGU",
+                    "\"THE\"Rock": 260,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                },{
+                    "rooms_shortname": "PHRM",
+                    "\"THE\"Rock": 236,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                }, {
+                    "rooms_shortname": "CHBE",
+                    "\"THE\"Rock": 200,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1,
+                    "The\"Lions\"Den": 1
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it("D3testSpecialCharacters&Escapewithoutkey", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 180
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "\"THE\"Rock",
+                        "The'?!@#$%^&*()\/nLions\"Den"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["\"THE\"Rock"]
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "\"THE\"Rock": {
+                            "SUM": "rooms_seats"
+                        }
+                    },{
+                        "The'?!@#$%^&*()\/nLions\"Den":{
+                            "COUNT": "rooms_seats"
+                        }
+                    },{
+                        "The\"Lions\"Den":{
+                            "COUNT":"rooms_type"
+                        }
+                    }]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            console.log(result.body)
+            console.log(result.code)
+            expect(result.code).eq(200);
+            expect(result.body).to.deep.equal({
+                "result": [{
+                    "\"THE\"Rock": 897,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1
+                },{
+                    "\"THE\"Rock": 755,
+                    "The'?!@#$%^&*()\/nLions\"Den": 3
+                },{
+                    "\"THE\"Rock": 700,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1
+                },{
+                    "\"THE\"Rock": 442,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1
+                },{
+                    "\"THE\"Rock": 388,
+                    "The'?!@#$%^&*()\/nLions\"Den": 2
+                },{
+                    "\"THE\"Rock": 375,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1
+                },{
+                    "\"THE\"Rock": 260,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1
+                },{
+                    "\"THE\"Rock": 236,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1
+                }, {
+                    "\"THE\"Rock": 200,
+                    "The'?!@#$%^&*()\/nLions\"Den": 1
+                }]
+            });
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it.only("D3testSpecialInvalidQuerywithMoreColumn", function() {
+        return IF.performQuery(   {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 180
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_type",
+                        "\"THE\"Rock",
+                        "The'?!@#$%^&*()\/nLions\"Den"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["\"THE\"Rock"]
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "\"THE\"Rock": {
+                            "SUM": "rooms_seats"
+                        }
+                    },{
+                        "The'?!@#$%^&*()\/nLions\"Den":{
+                            "COUNT": "rooms_seats"
+                        }
+                    },{
+                        "The\"Lions\"Den":{
+                            "COUNT":"rooms_type"
+                        }
+                    }]
+                }
+            }
+        ).then(function (result: any) {
+            Log.test("successful query!");
+            expect.fail();
+
+
+        }).catch(function (err) {
+            Log.test('Error: ' + err);
+            console.log(err.code)
+            expect(err.code).eq(400);
+        })
+    });
+
+    it.only("D3testNoWhere", function() {
+        return IF.performQuery(   {
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "\"THE\"Rock",
+                        "The'?!@#$%^&*()\/nLions\"Den",
+                        "The\"Lions\"Den"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["\"THE\"Rock"]
+                    }
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "\"THE\"Rock": {
+                            "SUM": "rooms_seats"
+                        }
+                    },{
+                        "The'?!@#$%^&*()\/nLions\"Den":{
+                            "COUNT": "rooms_seats"
+                        }
+                    },{
+                        "The\"Lions\"Den":{
+                            "COUNT":"rooms_type"
+                        }
+                    }]
+                }
+            }
+        ).then(function (result: any) {
+            expect.fail();
+           // expect(result.code).eq(200);
+        }).catch(function (err) {
+            console.log(err.code);
+            Log.test('Error: ' + err);
+            expect(err.code).eq(400);
         })
     });
 
@@ -2180,6 +2723,8 @@ describe("Test", function() {
             expect.fail();
         })
     });
+
+
 
     it( "D3testAllTokensinCourses", function() {
         return IF.performQuery(   {

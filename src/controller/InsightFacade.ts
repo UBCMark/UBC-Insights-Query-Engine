@@ -74,6 +74,23 @@ export default class InsightFacade implements IInsightFacade {
         return false;
     }
 
+    getAllIndexes(arr:any, val:any):any[] {
+        var indexes = [], i = -1;
+        while ((i = arr.indexOf(val, i+1)) != -1){
+            indexes.push(i);
+        }
+        return indexes;
+    }
+
+    getAllToSum(arr:any[], val:any, length:any):any[] {
+        var arrayToReturn = [];
+        for(var i=0; i<arr.length; i++){
+            if((i+val)%length===0){
+                arrayToReturn.push(arr[i]);
+            }
+        }
+        return arrayToReturn;
+    }
 
     htmlBuildInfoParse(html:any, hid:string):Promise<any>{
 
@@ -499,17 +516,17 @@ export default class InsightFacade implements IInsightFacade {
                 let group = query["TRANSFORMATIONS"]["GROUP"]  // Group Set (Array)
                 let apply = query["TRANSFORMATIONS"]["APPLY"]  // Apply Set (Array)
 
-                let applyTerms:any =[]  // ["rooms_seats"]
-                let applyKeys:any = [] //  ["MAX"]
-                let newKeys:any = [] // ["maxSeats"]
+                let applyTerms: any = []  // ["rooms_seats"]
+                let applyKeys: any = [] //  ["MAX"]
+                let newKeys: any = [] // ["maxSeats"]
                 for (let i in apply) {
                     console.log("foreach apply " + i);
-                    if(!newKeys.includes(Object.keys(apply[i])[0])) {   //duplicate
+                    if (!newKeys.includes(Object.keys(apply[i])[0])) {   //duplicate
                         newKeys.push(Object.keys(apply[i])[0]);
                         let applyEach = apply[i][Object.keys(apply[i])[0]]  // {"MAX": "rooms_seats"}
                         applyKeys.push(Object.keys(applyEach)[0])
                         applyTerms.push(applyEach[Object.keys(applyEach)[0]])
-                    }else{
+                    } else {
                         return reject({code: 400, body: {"error": "invalid because of duplicate define"}})
                     }
                 }
@@ -522,9 +539,14 @@ export default class InsightFacade implements IInsightFacade {
                 //     }
                 // }
                 //let needPush:boolean = true
-                let occurrences:any = []
-                let AvgArrayObj:any = {}
+                let occurrences: any = []
+                let AvgArrayObj: any = {}
                 let SumArrayObj: any = {}
+
+                let idxs: any[];
+                idxs = that.getAllIndexes(applyKeys, "SUM");
+
+
                 let r = result.reduce(function (res, obj) {
                     let unique = that.concatenate(obj, group);
                     // AvgArrayObj[unique] = [];
@@ -532,7 +554,7 @@ export default class InsightFacade implements IInsightFacade {
                     if (res[unique] === undefined) {
                         if (apply.length > 0) {
                             console.log("Init new rowwwwwwww!!!!!!!!!!!!!!");
-                            obj = that.transform(obj, apply,applyKeys,applyTerms, occurrences, AvgArrayObj[unique] = [], SumArrayObj[unique] = [])
+                            obj = that.transform(obj, apply, applyKeys, applyTerms, occurrences, AvgArrayObj[unique] = [], SumArrayObj[unique] = [])
                         }
                         res[unique] = obj;
                     } else {
@@ -542,21 +564,43 @@ export default class InsightFacade implements IInsightFacade {
                     }
                     return res
                 }, {})
+
+
                 if (applyKeys.includes("AVG")) {
-                    let i = applyKeys.indexOf("AVG")
-                    let avgField = newKeys[i]
+                    let idxs: any[];
+                    idxs = that.getAllIndexes(applyKeys, "AVG");
+
                     for (let unique in r) {
-                        let avg: number = Number((AvgArrayObj[unique].map((val:any) => <any>new Decimal(val)).reduce((a:any,b:any) => a.plus(b)).toNumber() / AvgArrayObj[unique].length).toFixed(2));
-                        r[unique][avgField] = avg
+                        for(let i of idxs) {
+                            let avgField = newKeys[i];
+                            let ArraytoAvg = that.getAllToSum(AvgArrayObj[unique], i, idxs.length);
+                            let avg: number = Number((ArraytoAvg.map((val: any) => <any>new Decimal(val)).reduce((a: any, b: any) => a.plus(b)).toNumber() / AvgArrayObj[unique].length).toFixed(2));
+                            r[unique][avgField] = avg
+                        }
                     }
                 }
+
                 if (applyKeys.includes("SUM")) {
-                    let i = applyKeys.indexOf("SUM")
-                    let sumField = newKeys[i]
+                    // getAllIndexes(arr:any, val:any):any[]
+
+                    let idxs: any[];
+                    idxs = that.getAllIndexes(applyKeys, "SUM");
+                    //console.log("array of sumIndex: "+ idxs);
                     for (let unique in r) {
-                        let sum = Number(SumArrayObj[unique].map((val:any) => new Decimal(val)).reduce((a:any,b:any) => a.plus(b)).toNumber().toFixed(2));
-                        r[unique][sumField] = sum
-                    }
+                            //console.log(unique);
+                        //console.log(unique);
+                        for(let i of idxs) {
+                            let sumField = newKeys[i]
+
+                            let ArraytoSum = that.getAllToSum(SumArrayObj[unique], i, idxs.length);
+                            let sum = Number(ArraytoSum.map((val: any) => new Decimal(val)).reduce((a: any, b: any) => a.plus(b)).toNumber().toFixed(2));
+                           // console.log("what is sumArray" + i + "-----" + SumArrayObj[unique]);
+                           // console.log("unique" + i + "-----" + r[unique][sumField]);
+                           // console.log("sum:" + sum);
+                            r[unique][sumField] = sum
+                        }
+                     }
+                    // }
                 }
 
                 resultObj = r
