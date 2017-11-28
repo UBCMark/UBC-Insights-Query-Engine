@@ -539,7 +539,7 @@ export default class InsightFacade implements IInsightFacade {
                 //     }
                 // }
                 //let needPush:boolean = true
-                let occurrences: any = []
+                let occurrences: any = {}
                 let AvgArrayObj: any = {}
                 let SumArrayObj: any = {}
 
@@ -554,12 +554,13 @@ export default class InsightFacade implements IInsightFacade {
                     if (res[unique] === undefined) {
                         if (apply.length > 0) {
                             console.log("Init new rowwwwwwww!!!!!!!!!!!!!!");
-                            obj = that.transform(obj, apply, applyKeys, applyTerms, occurrences, AvgArrayObj[unique] = [], SumArrayObj[unique] = [])
+                            occurrences[unique] = [];
+                            obj = that.transform(obj, apply, applyKeys, applyTerms, occurrences[unique], AvgArrayObj[unique] = [], SumArrayObj[unique] = [])
                         }
                         res[unique] = obj;
                     } else {
                         if (apply.length > 0) {
-                            res[unique] = that.updateRow(obj, res[unique], apply, applyKeys, applyTerms, occurrences, AvgArrayObj[unique], SumArrayObj[unique])
+                            res[unique] = that.updateRow(obj, res[unique], apply, applyKeys, applyTerms, occurrences[unique], AvgArrayObj[unique], SumArrayObj[unique])
                         }
                     }
                     return res
@@ -899,8 +900,8 @@ export default class InsightFacade implements IInsightFacade {
                 if (!colItems.includes(order)) return false
             } else { // multiple fields
                 let orderKeys = Object.keys(order)
-                if (orderKeys.length !== 2 || orderKeys[0] !== "dir" || (order["dir"] !== "UP" && order["dir"] !== "DOWN")
-                    ||orderKeys[1] !== "keys") {
+                if (orderKeys.length !== 2 || !((orderKeys[0] === "dir" && orderKeys[1] === "keys")||(orderKeys[1] === "dir" && orderKeys[0] === "keys"))|| (order["dir"] !== "UP" && order["dir"] !== "DOWN")
+                ) {
                     return false
                 }
                 let fields = order["keys"]
@@ -1130,8 +1131,8 @@ export default class InsightFacade implements IInsightFacade {
                 if (!colItems.includes(order)) return false
             } else { // multiple fields
                 let orderKeys = Object.keys(order)
-                if (orderKeys.length !== 2 || orderKeys[0] !== "dir" || (order["dir"] !== "UP" && order["dir"] !== "DOWN")
-                    ||orderKeys[1] !== "keys") {
+                if (orderKeys.length !== 2 || !((orderKeys[0] === "dir" && orderKeys[1] === "keys")||(orderKeys[1] === "dir" && orderKeys[0] === "keys"))|| (order["dir"] !== "UP" && order["dir"] !== "DOWN")
+                    ) {
                     return false
                 }
                 let fields = order["keys"]
